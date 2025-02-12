@@ -1,3 +1,66 @@
+Oppgavetekst: https://rouhani.folk.ntnu.no/textbooks/tdt4114/content/proj_environment/README.html
+Foreslåtte kilder: https://developer.yr.no/ og https://www.eea.europa.eu/en/analysis
+Foreslåtte verktøy og biblioteker: 
+ - Python
+ - Jupyter Notebook
+ - Pandas (for databehandling)
+ - NumPy (for numeriske beregninger)
+ - Matplotlib/Seaborn/Plotly (for visualisering)
+ - Pandas SQL
+
+
+
+Tidsplan:
+Uke 6-7: Oppsett av utviklingsmiljø og datainnsamling
+Uke 8-11: Databehandling og analyse
+Uke 12-14: Visualisering og prediktiv analyse
+Uke 15: Testing og dokumentasjon
+
+
+Oppgave 2: Datainnsamling
+ - Identifiser relevante åpne datakilder
+ - Implementere funksjonalitet for å hente data fra disse kildene ved hjelp av Python-moduler som requests
+ - For å integrere dataene i applikasjonen: tekstfiler, CSV-filer, JSON-data, samt fil- og katalogadministrasjon. 
+ - Bruk list comprehensions, iteratorer og Pandas SQL (sqldf) for å utforske og forstå dataenes struktur og innhold før de forberedes for videre analyse.
+
+Vurderingskriterier:
+ - Hvilke åpne datakilder er identifisert som relevante for miljødata, og hva er kriteriene (f.eks. kildeautoritet, datakvalitet, tilgjengelighet, brukervennlighet osv.) for å vurdere deres pålitelighet og kvalitet?
+ - Hvilke teknikker (f.eks. håndtering av CSV-filer, JSON-data) er valgt å bruke for å lese inn dataene, og hvordan påvirker disse valgene datakvaliteten og prosessen videre?
+ - Dersom det er brukt API-er, hvilke spesifikke API-er er valgt å bruke, og hva er de viktigste dataene som kan hentes fra disse kildene?
+
+
+Oppgave 3: Databehandling
+Her skal dere fokusere på databehandling ved å utvikle funksjoner som renser og formaterer de innsamlede dataene, med særlig vekt på håndtering av manglende verdier og uregelmessigheter ved hjelp av Pandas. I tillegg skal dere benytte teknikker som list comprehensions, iteratorer, pandas og pandas sql (sqldf) for å manipulere dataene effektivt, noe som vil bidra til å forberede dataene for videre analyse.
+
+Vurderingskriterier:
+ - Hvilke metoder vil du bruke for å identifisere og håndtere manglende verdier i datasettet?
+ - Kan du gi et eksempel på hvordan du vil bruke list comprehensions for å manipulere dataene?
+ - Hvordan kan Pandas SQL (sqldf) forbedre datamanipuleringen sammenlignet med tradisjonelle Pandas-operasjoner?
+ - Hvilke spesifikke uregelmessigheter i dataene forventer du å møte, og hvordan planlegger du å håndtere dem?
+
+
+
+
+Krav:
+ - Positive og negative enhetstester (unittest-rammeverket)
+   - Har enhetstestene beskrivende navn som dokumenterer hva testene gjør?
+   - Tas det hensyn til både positive og negative tilfeller?
+   - Er testdekningen god nok?
+ - Git, versjonshåndtering, og grener
+   - Er prosjektet underlagt versjonskontroll med sentral repro?
+   - Sjekkes det inn jevnlig?
+   - Beskriver commit-meldingene endringene på en kort og konsis måte?
+ - Dokumentasjon
+   - Standard for kodestil (PEP 8)
+   - Riktig og konsistent bruk av innrykk, variabelnavn, kommentarer
+   - Tydelig inkludere kildereferanser (kildeautoritet, datakvalitet og tilgjengelighet)
+   - Er all kode og annen prosjektdokumentasjon godt dokumentert, med tydelige forklaringer og kildereferanser?
+   - Følger anbefalte standarder, som PEP 8 for Python for kodestil?
+   - Dokumenterer hvor dataene kommer fra, inkludert API-er og åpne datakilder?
+
+
+
+
 Vurderingskriterier:
 
 1. Kvaliteten på datainnsamlingen og forberedelsen: Vurderingen av datainnsamlingen vil fokusere på hvor godt dere har identifisert relevante og pålitelige åpne datakilder. Det vil også bli vurdert hvordan dere har implementert funksjonalitet for å hente data ved hjelp av Python-moduler, samt deres evne til å håndtere ulike datatyper som tekstfiler, CSV og JSON. Kvaliteten på databehandlingen, inkludert rensing og formatering av dataene, samt håndtering av manglende verdier og uregelmessigheter, vil også være sentral i vurderingen.
