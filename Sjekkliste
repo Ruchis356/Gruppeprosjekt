@@ -10,11 +10,14 @@ Foreslåtte verktøy og biblioteker:
 
 
 
+
 Tidsplan:
 Uke 6-7: Oppsett av utviklingsmiljø og datainnsamling
 Uke 8-11: Databehandling og analyse
 Uke 12-14: Visualisering og prediktiv analyse
 Uke 15: Testing og dokumentasjon
+
+
 
 
 Oppgave 2: Datainnsamling
@@ -30,13 +33,69 @@ Vurderingskriterier:
 
 
 Oppgave 3: Databehandling
-Her skal dere fokusere på databehandling ved å utvikle funksjoner som renser og formaterer de innsamlede dataene, med særlig vekt på håndtering av manglende verdier og uregelmessigheter ved hjelp av Pandas. I tillegg skal dere benytte teknikker som list comprehensions, iteratorer, pandas og pandas sql (sqldf) for å manipulere dataene effektivt, noe som vil bidra til å forberede dataene for videre analyse.
+ - Utvikle funksjoner som renser og formaterer de innsamlede dataene
+ - Fokuser på håndtering av manglende verdier og uregelmessigheter ved hjelp av Pandas
+ - benytte teknikker som list comprehensions, iteratorer, pandas og pandas sql (sqldf) for å manipulere dataene effektivt
 
 Vurderingskriterier:
  - Hvilke metoder vil du bruke for å identifisere og håndtere manglende verdier i datasettet?
  - Kan du gi et eksempel på hvordan du vil bruke list comprehensions for å manipulere dataene?
  - Hvordan kan Pandas SQL (sqldf) forbedre datamanipuleringen sammenlignet med tradisjonelle Pandas-operasjoner?
  - Hvilke spesifikke uregelmessigheter i dataene forventer du å møte, og hvordan planlegger du å håndtere dem?
+
+
+Oppgave 4: Dataanalyse
+ - Bruk verktøy som NumPy, Pandas, Matplotlib osv
+ - Beregne statistiske mål som gjennomsnitt, median og standardavvik
+ - Implementer enkle statistiske analyser for å avdekke mønstre i dataene
+
+Vurderingskriterier:
+ - Hvordan kan du bruke NumPy og Pandas til å beregne gjennomsnitt, median og standardavvik for de innsamlede dataene, og hvorfor er disse statistiske målene viktige?
+ - Kan du gi et eksempel på hvordan du vil implementere en enkel statistisk analyse for å undersøke sammenhengen mellom to variabler i datasettet?
+ - Hvordan planlegger du å håndtere eventuelle skjevheter i dataene under analysen, og hvilke metoder vil du bruke for å sikre at analysen er pålitelig?
+ - Hvilke visualiseringer vil du lage for å støtte analysen din, og hvordan vil disse visualiseringene hjelpe deg med å formidle funnene dine?
+
+
+Oppgave 5: Visualisering
+ - Bruk Matplotlib og Seaborn for å skape visualiseringer av de analyserte miljødataene
+ - Utvikle grafer og diagrammer som illustrerer endringer i luftkvalitet over tid, sammenligning av temperaturdata, og andre relevante trender
+- Utforsk muligheten for å lage interaktive visualiseringer ved hjelp av Widgets, Plotly eller Bokeh dersom tiden tillater det
+
+Vurderingskriterier:
+ - Hvilke spesifikke typer visualiseringer planlegger du å lage for å representere endringer i luftkvalitet og temperaturdata, og hvorfor valgte du disse?
+ - Hvordan kan Matplotlib og Seaborn brukes til å forbedre forståelsen av de analyserte dataene, og hvilke funksjoner i disse bibliotekene vil være mest nyttige?
+ - Hvordan vil du håndtere og visualisere manglende data i grafene dine for å sikre at de fortsatt er informative?
+ - Kan du beskrive prosessen for å lage interaktive visualiseringer med Widgets, Plotly eller Bokeh, og hvilke fordeler dette kan gi i forhold til statiske visualiseringer?
+ - Hvordan vil du evaluere effektiviteten av visualiseringene dine i å formidle de viktigste funnene fra dataanalysen til et bredere publikum?
+
+
+Oppgave 6: Prediktiv analyse
+ - Prediktiv analyse 
+ - Implementeringen av lineær regresjon ved hjelp av scikit-learn, for å forutsi fremtidige miljøforhold basert på historiske data
+ - Forberede dataene ved å identifisere relevante funksjoner og målvariabler, samt håndtere eventuelle manglende verdier som kan påvirke modellens nøyaktighet
+ - Tren regresjonsmodellen på de rensede dataene, evaluere dens ytelse ved hjelp av passende metoder som beregning av feilmål, og til slutt bruke modellen til å lage prediksjoner for fremtidige miljøforhold
+
+Vurderingskriterier:
+ - Lag minst tre forskjellige typer visualiseringer (f.eks. linjediagrammer, søylediagrammer og scatterplots) for å representere endringer i luftkvalitet og temperaturdata over tid. Forklar valget av visualiseringstype for hver graf.
+ - Implementer visualiseringer ved hjelp av Matplotlib og Seaborn. Inkluder tilpassede akser, titler, og fargepaletter for å forbedre lesbarheten og estetikk.
+ - Demonstrer hvordan manglende data håndteres i visualiseringene. Lag en graf som viser hvordan manglende verdier påvirker datatrender, og diskuter hvordan dette kan påvirke tolkningen av dataene.
+ - Skriv en kort evaluering av de utviklede visualiseringene. Diskuter hvilke visualiseringer som var mest effektive for å formidle informasjon, og hvorfor. Reflekter over tilbakemeldinger fra medstudenter eller veileder.
+
+
+Oppgave 7: Refleksjonsnotat
+ - Skriv et refleksjonsnotat (maks 800 ord)
+
+Vurderingskriterier:
+ - Refleksjoner over hva du har lært om datainnsamling, databehandling, dataanalyse og visualisering.
+ - Beskrivelse av nye ferdigheter som ble tilegnet, for eksempel bruk av spesifikke biblioteker (Pandas, NumPy, Matplotlib, etc.) og programmeringskonsepter.
+ - Identifisering av spesifikke utfordringer som oppstod under prosjektet, for eksempel problemer med datakvalitet, håndtering av manglende verdier, eller tekniske problemer med API-er.
+ - Refleksjoner over samarbeidet i gruppen, inkludert hvordan oppgaver ble fordelt og hvordan kommunikasjonen fungerte.
+ - Vurdering av de endelige resultatene, inkludert kvaliteten på visualiseringene og analysene.
+ - Ideer til hvordan prosjektet kan forbedres i fremtiden, både i forhold til tekniske aspekter og prosjektledelse.
+ - Mulige retninger for videre forskning eller utvikling basert på erfaringene fra prosjektet.
+ - Oppsummering av de viktigste læringspunktene og hvordan prosjektet har bidratt til studentenes forståelse av datavitenskap og miljøstudier.
+ - Personlige tanker om hvordan erfaringene fra prosjektet kan anvendes i fremtidige studier eller yrkesliv.
+
 
 
 
@@ -115,5 +174,15 @@ Beregner statistiske mål som:
 
 
 
+
+
+
+COMPLETE
+*** Oppgave 1: Sett opp utviklingsmiljø
+*** - Opprett et nytt «repository» på GitHub med et beskrivende navn for prosjektet (f.eks. “Miljødataanalyseapplikasjon”).
+*** - Last ned og installer den nyeste versjonen av Python fra den offisielle nettsiden (https://www.python.org/downloads/). Sørg for at Python er lagt til i systemets PATH under installasjonen.
+*** - Last ned og installer Visual Studio Code fra den offisielle nettsiden (https://code.visualstudio.com/). Åpne VSCode og installer nødvendige utvidelser for Python og Jupyter. Dette kan gjøres ved å gå til Extensions (Ctrl+Shift+X) og søke etter “Python” og “Jupyter”.
+*** - Klon dette «repository»-et til din lokale maskin ved hjelp av Git (eller utviklingsverktøyet ditt).
+*** - I VSCode, opprett en ny Jupyter Notebook-fil (med filendelsen «.ipynb») i prosjektmappen. Skriv og kjør følgende kode i den første cellen for å teste at miljøet fungerer som det skal:
 
 
