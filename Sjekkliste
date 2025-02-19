@@ -1,6 +1,7 @@
 *** Indikerer at dette punktet er ferdigstilt eller gjennomført
 
 
+OVERORDNET MÅL: Hente og bruke historisk data om vær og luftkvalitet til å forutsi hvordan luftkvaliteten utvikler seg de neste dagene basert på været den siste tiden. 
 
 
 
@@ -27,15 +28,15 @@ Uke 15: Testing og dokumentasjon
 
 
 Oppgave 2: Datainnsamling
- - Identifiser relevante åpne datakilder
+ - Identifiser relevante åpne datakilder (Kilde: Nilu, Data: Luftkvalitet - Kilde:Meterologisk institutt, Data: Vær)
 *** - Implementere funksjonalitet for å hente data fra disse kildene ved hjelp av Python-moduler som requests
  - For å integrere dataene i applikasjonen: tekstfiler, CSV-filer, JSON-data, samt fil- og katalogadministrasjon. 
  - Bruk list comprehensions, iteratorer og Pandas SQL (sqldf) for å utforske og forstå dataenes struktur og innhold før de forberedes for videre analyse.
 
 Vurderingskriterier:
  - Hvilke åpne datakilder er identifisert som relevante for miljødata, og hva er kriteriene (f.eks. kildeautoritet, datakvalitet, tilgjengelighet, brukervennlighet osv.) for å vurdere deres pålitelighet og kvalitet?
-    - Meterologisk institutt. Kildeautoritet er det viktigste kriteriet. Dette er et statlig institutt som står for meterologisk utforskning og suppler meterologisk data for folkeinformasjon via blant annet yr.no. Tilgjengeligheten er også god, da MI legger ut all meterologisk data via API. Fordi de bruker API er det også relativt brukervennlig.
-    - 
+    - Meterologisk institutt. Kildeautoritet er det viktigste kriteriet. Dette er et statlig institutt som står for meterologisk utforskning og suppler meterologisk data for folkeinformasjon via blant annet yr.no. Tilgjengeligheten er også god, da MI legger ut all meterologisk data via API. Fordi de bruker API er det også relativt brukervennlig. Frost API. Med Frost API har de veiledning og tutorials på hvordan vi kan importere og bruke data fra MI i python spesifikt. 
+    - Nilu (Tidligere norsk institutt for luftforskning) for miljødata. Nonprofit og uavhengig. Forskningsinstitutt. Brukervennlig. De har eksistert i flere tiår og utviklet seg over tid. 
  - Hvilke teknikker (f.eks. håndtering av CSV-filer, JSON-data) er valgt å bruke for å lese inn dataene, og hvordan påvirker disse valgene datakvaliteten og prosessen videre?
  - Dersom det er brukt API-er, hvilke spesifikke API-er er valgt å bruke, og hva er de viktigste dataene som kan hentes fra disse kildene?
 
