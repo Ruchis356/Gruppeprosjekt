@@ -5,4 +5,6 @@ print('Det funka jo!')
 
 
 Spørsmål:
-1. 
+1. Sjekk om å bruke værdata og luftkvalitetdata for å forutsi fremtidig luftkvalitet er noe ala det de forventer 
+2. Hvor mye data er det forventet at vi behandler? Er 10 år med daglige gjennomsnitt (nedbør, vind, luftkvalitet, o.l.) en passende mengde?
+3. 
