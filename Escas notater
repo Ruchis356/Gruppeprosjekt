@@ -5,4 +5,7 @@ print('Det funka jo!')
 
 
 Spørsmål:
-1. 
+1. Sjekk om å bruke værdata og luftkvalitetdata for å forutsi fremtidig luftkvalitet er noe ala det de forventer. Burde vi gjøre mer? Mindre? Noe helt annet? 
+2. Hvor mye data er det forventet at vi behandler? Er 10 år med daglige gjennomsnitt (nedbør, vind, luftkvalitet, o.l.) en passende mengde? Vi blir å behandle rundt 2500 datapunker.
+3. Hva er egentlig forskjellen på en jupyter notebook og en .py fil? Når vi jobber gjennom GitHub, hva har jupyter som py ikke har?
+4. Burde eller skal vi ha én 'main' fil der vi kaller til flere andre filer i samme mappe? Dvs, vi skriver en fil som kun importerer data og legger det i en dataframe, så skriver vi en "call" i mainfilen *til* denne data-import filen og kjører koden på den måten, slik at ikke all koden ligger i én tekst-fil slik vi har nå. Er dette en lur måte å gjøre det på i forhold til branches?
