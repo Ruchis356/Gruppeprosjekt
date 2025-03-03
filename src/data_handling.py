@@ -24,8 +24,8 @@ class RefinedData:
         if missing_values.any().any():
             # Iterate over the DataFrame to find exact locations
             for row, col in zip(*missing_values.to_numpy().nonzero()):
-                missing_locations.append((row, df.columns[col]))
-            missing_df = pd.DataFrame(missing_values, columns=['index', 'column']) 
+                missing_locations.append({'index': row, 'column': df.columns[col]})
+            missing_df = pd.DataFrame(missing_locations) 
             return missing_df
         else:
             print("No missing values found in the data set! \n")
