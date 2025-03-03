@@ -1,26 +1,32 @@
-
 import requests
 import pandas as pd
 
-# ------------------------------------------
-# WEATHER DATA - IMPORT
-# ------------------------------------------
+#A class to import and handle environmental data (weather and air quality)
+class EnvironmentalData:
 
-    # Global variables needed to run the function independently
-#weather_time = '2024-02-19/2024-03-19'
-#weather_station = 'SN68860'
-#weather_elements = 'mean(air_temperature P1D),sum(precipitation_amount P1D),mean(wind_speed P1D)'
-#weather_resolution = 'P1D' 
+    #Initialize the EnvironmentalData class
+    def __init__(self):
+        self.df = None
 
+    # ------------------------------------------
+    # WEATHER DATA - IMPORT
+    # ------------------------------------------
 
-class EnvironmentaleData:
+    #Fetch weather data from the Frost API 
+    def get_met(self, weather_station, weather_elements, weather_time, weather_resolution):
 
-    def __init__(self, data):
-        self.df = []
+        """
+        Args:
+            weather_station (str): The ID of the weather station.
+            weather_elements (str): The measurements to include.
+            weather_time (str): The time range for the data.
+            weather_resolution (str): The granularity of the data.
 
-    def get_met():
+        Returns:
+            pd.DataFrame: A DataFrame containing the weather data.
+        """        
 
-        # Client ID to access data from 
+        # Client ID to access data from Frost API
         client_id = 'd933f861-70f3-4d0f-adc6-b1edb5978a9e'
 
         # Define endpoints and parameters
@@ -46,7 +52,7 @@ class EnvironmentaleData:
             print('Error! Statuscode:', r.status_code)
             print('Message:', json_data['error']['message'])
             print('Cause:', json_data['error']['reason'])
-            exit()  
+            return None
 
         # Create and set up the dataframe
         df = pd.DataFrame()
@@ -57,6 +63,7 @@ class EnvironmentaleData:
 
 
         # Remove uneeded collumns  
+
         '''add timeoffset if we decide not to use it: , "timeOffset"'''
 
         columns_to_drop = ["level", "timeResolution", "timeSeriesId", "elementId", "performanceCategory", "exposureCategory", "qualityCode"]
@@ -66,47 +73,28 @@ class EnvironmentaleData:
         df["referenceTime"] = df["referenceTime"].str.split("T").str[0]
 
         print('There are ', df.shape[0], 'lines of data in this dataframe.\n')
+        self.df = df
 
         #Returns dataframe upon request
         return(df)
-
-
-
-
-    # *** EVERYTHING below this line is purely for local testing purposes of this specific file ***
-    '''Fjern # foran de to linjene under som kjører funksjonen og så printer den, for å se om det virker :)
-    Husk og de kommenterte variablene på toppen!'''
-
-        # Run the function to get the dataframe with the weather data
-    #df=get_met()
-
-        # Show the first few rows of the dataframe
-    #print(df.head())
-
-
-
-
-
-
-
-
-
-
 
 
     # ------------------------------------------
     # WAIR QUALITY DATA - IMPORT
     # ------------------------------------------
 
+    # Fetch air quality data by Nilu from a CSV file
+    def get_nilu(self, threshold, file_path): 
 
+        """
+        Args:
+            file_path (str): Path to the CSV file.
+            threshold (float): Threshold for coverage values.
 
-    # Global variables needed to run the function independently
-    threshold = 95 
-    file_path = '../Data/luftkvalitet_trondheim_dag.csv'
+        Returns:
+            pd.DataFrame: A DataFrame containing the air quality data.
+        """
 
-    def get_nilu(): 
-
-        # Trying to read the data from the csv file
         try:
             df = pd.read_csv(
                 file_path,
@@ -116,22 +104,9 @@ class EnvironmentaleData:
                 on_bad_lines='skip'  
             )
         
-            '''# Print av data gjøres i main, så denne delen kan slettes.
-    #        print("Første rader av datasettet:")
-    #        print(luftkvalitet_df.head())
-    #        print("\nAntall rader og kolonner i datasettet:")
-    #        print(luftkvalitet_df.shape)'''
-
-
             # Convert the 'Tid' column to a date-time format
             df['Tid'] = pd.to_datetime(df['Tid'], format='%d.%m.%Y %H:%M')
             time_column = 'Tid' 
-
-
-            '''#Vi vil ikke ha tid som indeks. Slett?
-            # Sett 'Tid' som indeks
-        #    luftkvalitet_df.set_index('Tid', inplace=True)'''
-
 
             # Replace empty values with NaN
             df.replace('', pd.NA, inplace=True)      
@@ -143,42 +118,20 @@ class EnvironmentaleData:
             # Converting all collumns except for the 'Tid' column to numerical values
             df[df.columns.difference([time_column])] = df[
                 df.columns.difference([time_column])
-            ].apply(pd.to_numeric, errors='coerce')
-
-
-            ''' Den gamle koden for å gjøre om til nummer. Jeg har skrevet den litt mer robust, og tatt hensyn til "Tid" kolonnen
-                    #    df = df.apply(pd.to_numeric, errors='ignore')'''
-            
+            ].apply(pd.to_numeric, errors='coerce')            
 
             # Replace the coverage(uptime) values that fall below the treshold with 0, to exclude the data from analysis
             columns_coverage = ['Dekning', 'Dekning.1', 'Dekning.2', 'Dekning.3', 'Dekning.4']
             for col in columns_coverage:
                 df.loc[df[col] < threshold, col] = 0
 
-
-            '''Likeså har jeg utvidet funksjonen som bytter ut "ikke god nok" dekning med 0, bl. annet tar med alle 5 deknings-kolonnene, ikke bare de tre første.'''
-
-
-            ''' Er det tenkt å bruke denne delen til noe spesifikt? Hvis ikke kan vi slette den og jobbe med statistikken senere (i en annen fil).
-            # Vis statistikk for datasettet
-            #print("\nStatistikk for datasettet:")
-            #print(df.describe())'''
-
-
             # Print some basic information about the dataframe
             print('Data collected from nilu.com!')
             print('There are ', df.shape[0], 'lines of data in this dataframe.\n')
+            self.df = df
 
             #Returns dataframe upon request        
             return(df)
-
-
-            '''#renger vi å lagre datene til en ny csv-fil? Eller skal vi bare la det være en dataframe? Slett?
-            # Lagrer de behandlede dataene til en ny CSV-fil
-        #    output_file_path = 'behandlet_luftkvalitet_trondheim.csv'
-        #    luftkvalitet_df.to_csv(output_file_path)
-        #    print(f"\nBehandlede data lagret til {output_file_path}")'''
-
 
         # Return an error code if reading the csv file failed
         except FileNotFoundError:
@@ -189,23 +142,50 @@ class EnvironmentaleData:
             print(f"An unexpected error has occured: {e}")
 
 
+    # ------------------------------------------
+    # PROCESSING MISSING DATA
+    # ------------------------------------------
 
-    '''#Denne kan fjernes. Den ligger i main. Slett?
-        # Changes pandas to show the whole dataframe 
-        #pd.set_option('display.max_rows', None)
-        #pd.set_option('display.max_columns', None)
-        #pd.set_option('display.width', None)
-        # Shows the whole dataframe
-        #display(luftkvalitet_df)'''
+    def missing_data(self, df):
+
+        """
+        Args:
+            df (pd.DataFrame): The DataFrame to check for missing values.
+        """
+
+        # Check for missing values
+        missing_values = df.isna()
+
+        # If there are missing values, print their locations
+        if missing_values.any().any():
+            print("⚠️ Missing values found at these locations:")
+        
+            # Iterate over the DataFrame to find exact locations
+            for row, col in zip(*missing_values.to_numpy().nonzero()):
+                print(f"Missing value at Row {row}, Column '{df.columns[col]}'")
+        else:
+            print("No missing values found in the weather data! \n")
 
 
+    # ------------------------------------------
+    # WAIR QUALITY DATA - PROCESSING
+    # ------------------------------------------
 
-    # *** EVERYTHING below this line is purely for local testing purposes of this specific file ***
-    '''Fjern # foran de to linjene under som kjører funksjonen og så printer den, for å se om det virker :)
-    Husk og de kommenterte variablene på toppen!'''
+    def show_zeroes(self, df):
 
-        # Run the function to get the dataframe with the air quality data
-    df=get_nilu()
+        # Specifying the coverage columns to check
+        columns_to_check = ['Dekning', 'Dekning.1', 'Dekning.2', 'Dekning.3', 'Dekning.4']
 
-        # Show the first few rows of the dataframe
-    print(df)    
+        # Find all data points with a value of 0 in those columns
+        zero_values = df[columns_to_check][df[columns_to_check] == 0]
+
+        # Show the index numbers of the rows that contain a datapoint 0 in a coverage column
+        rows_with_zero = zero_values.dropna(how='all')
+
+        if not rows_with_zero.empty:
+            return rows_with_zero.index
+
+        else:
+            # If there are no rows, return an empty index
+            print("No coverage was poor enough to be excluded.")
+            return pd.Index([])
