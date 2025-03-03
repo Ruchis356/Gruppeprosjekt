@@ -162,13 +162,14 @@ class EnvironmentalData:
 
         # If there are missing values, print their locations
         if missing_values.any().any():
+            print("These are the locations of the missing data:\n")
             # Iterate over the DataFrame to find exact locations
             for row, col in zip(*missing_values.to_numpy().nonzero()):
                 missing_locations.append((row, df.columns[col]))
+                return missing_locations
         else:
-            print("No missing values found in the weather data! \n")
-
-        return missing_locations
+            print("No missing values found in the data set! \n")
+            return None
 
 
     # ------------------------------------------
