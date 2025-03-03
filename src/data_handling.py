@@ -27,7 +27,7 @@ class RefinedData:
         missing_df = pd.DataFrame(missing_locations) 
 
         # If there are missing values, print their locations
-        if missing_df.empty():
+        if missing_df.empty:
             print("No missing values found in the data set! \n")
             return None
         else:
