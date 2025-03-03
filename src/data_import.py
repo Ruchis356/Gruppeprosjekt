@@ -146,6 +146,7 @@ class EnvironmentalData:
     # PROCESSING MISSING DATA
     # ------------------------------------------
 
+    # Check for missing data points and return a list
     def missing_data(self, df):
 
         """
@@ -156,21 +157,25 @@ class EnvironmentalData:
         # Check for missing values
         missing_values = df.isna()
 
+        # Initialize an empty list to store missing value locations
+        missing_locations = []
+
         # If there are missing values, print their locations
         if missing_values.any().any():
-            print("⚠️ Missing values found at these locations:")
-        
             # Iterate over the DataFrame to find exact locations
             for row, col in zip(*missing_values.to_numpy().nonzero()):
-                print(f"Missing value at Row {row}, Column '{df.columns[col]}'")
+                missing_locations.append((row, df.columns[col]))
         else:
             print("No missing values found in the weather data! \n")
+
+        return missing_locations
 
 
     # ------------------------------------------
     # WAIR QUALITY DATA - PROCESSING
     # ------------------------------------------
 
+    # Check for datapoints = 0
     def show_zeroes(self, df):
 
         # Specifying the coverage columns to check
