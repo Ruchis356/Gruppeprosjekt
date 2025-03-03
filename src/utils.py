@@ -1,7 +1,7 @@
 import pandas as pd
 
 #A class to import and handle environmental data (weather and air quality)
-class VisualData:
+class VisualTable:
 
     #Initialize the EnvironmentalData class
     def __init__(self):
