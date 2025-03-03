@@ -80,10 +80,14 @@ class RawData:
             return(df)
         
         # Return an error code if fetching the weather data fails
-        except :
-            print(f"")
-        except :
-            print("Error: ")
+        except requests.exceptions.ConnectionError:
+            print("Error: Failed to connect to the Frost API. Check your internet connection.")
+        except requests.exceptions.Timeout:
+            print("Error: The request to the Frost API timed out. Please try again later.")
+        except requests.exceptions.HTTPError as e:
+            print(f"Error: The Frost API returned an HTTP error: {e}")
+        except ValueError as e:
+            print(f"Error: The Frost API response could not be parsed as JSON: {e}")
         except Exception as e:
             print(f"An unexpected error has occured: {e}")
 
