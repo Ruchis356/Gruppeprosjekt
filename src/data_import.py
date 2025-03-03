@@ -26,57 +26,66 @@ class RawData:
             pd.DataFrame: A DataFrame containing the weather data.
         """        
 
-        # Client ID to access data from Frost API
-        client_id = 'd933f861-70f3-4d0f-adc6-b1edb5978a9e'
+        try:
+            # Client ID to access data from Frost API
+            client_id = 'd933f861-70f3-4d0f-adc6-b1edb5978a9e'
 
-        # Define endpoints and parameters
-        endpoint = 'https://frost.met.no/observations/v0.jsonld'
-        parameters = {
-            'sources': weather_station,  # Station ID for Voll weather station
-            'elements': weather_elements,  # Requestion various types of eather data
-            'referencetime': weather_time,  # Limiting the time frame for the data request
-            'timeresolutions': weather_resolution,  # Set the resolution(granularity) of the data
-        }
+            # Define endpoints and parameters
+            endpoint = 'https://frost.met.no/observations/v0.jsonld'
+            parameters = {
+                'sources': weather_station,  # Station ID for Voll weather station
+                'elements': weather_elements,  # Requestion various types of eather data
+                'referencetime': weather_time,  # Limiting the time frame for the data request
+                'timeresolutions': weather_resolution,  # Set the resolution(granularity) of the data
+            }
 
-        # Send an HTTP GET-request
-        r = requests.get(endpoint, params=parameters, auth=(client_id, ''))
+            # Send an HTTP GET-request
+            response = requests.get(endpoint, params=parameters, auth=(client_id, ''))
 
-        # Extract JSON-data
-        json_data = r.json()
+            # Extract JSON-data
+            json_data = response.json()
 
-        # Check if the request was succesfull, and exit if not
-        if r.status_code == 200:
-            data = json_data['data']
-            print('Data collected from frost.met.no!')
-        else:
-            print('Error! Statuscode:', r.status_code)
-            print('Message:', json_data['error']['message'])
-            print('Cause:', json_data['error']['reason'])
-            return None
+            # Check if the request was succesfull, and exit if not
+            if response.status_code == 200:
+                data = json_data['data']
+                print('Data collected from frost.met.no!')
+            else:
+                print('Error! Statuscode:', r.status_code)
+                print('Message:', json_data['error']['message'])
+                print('Cause:', json_data['error']['reason'])
+                return None
 
-        # Create and set up the dataframe
-        df = pd.DataFrame()
-        for obs in data:
-            row = pd.DataFrame(obs['observations'])
-            row['referenceTime'] = obs['referenceTime']
-            df = pd.concat([df, row], ignore_index=True)
+            # Create and set up the dataframe
+            df = pd.DataFrame()
+            for obs in data:
+                row = pd.DataFrame(obs['observations'])
+                row['referenceTime'] = obs['referenceTime']
+                df = pd.concat([df, row], ignore_index=True)
 
 
-        # Remove uneeded collumns  
+            # Remove uneeded collumns  
 
-        '''add timeoffset if we decide not to use it: , "timeOffset"'''
+            '''add timeoffset if we decide not to use it: , "timeOffset"'''
 
-        columns_to_drop = ["level", "timeResolution", "timeSeriesId", "elementId", "performanceCategory", "exposureCategory", "qualityCode"]
-        df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
+            columns_to_drop = ["level", "timeResolution", "timeSeriesId", "elementId", "performanceCategory", "exposureCategory", "qualityCode"]
+            df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
 
-        # Remove time portion from 'referenceTime' (keep only 'YYYY-MM-DD')
-        df["referenceTime"] = df["referenceTime"].str.split("T").str[0]
+            # Remove time portion from 'referenceTime' (keep only 'YYYY-MM-DD')
+            df["referenceTime"] = df["referenceTime"].str.split("T").str[0]
 
-        print('There are ', df.shape[0], 'lines of data in this dataframe.\n')
-        self.df = df
+            print('There are ', df.shape[0], 'lines of data in this dataframe.\n')
+            self.df = df
 
-        #Returns dataframe upon request
-        return(df)
+            #Returns dataframe upon request
+            return(df)
+        
+        # Return an error code if fetching the weather data fails
+        except :
+            print(f"")
+        except :
+            print("Error: ")
+        except Exception as e:
+            print(f"An unexpected error has occured: {e}")
 
 
     # ------------------------------------------
