@@ -22,7 +22,6 @@ class RefinedData:
 
         # If there are missing values, print their locations
         if missing_values.any().any():
-            print("These are the locations of the missing data:\n")
             # Iterate over the DataFrame to find exact locations
             for row, col in zip(*missing_values.to_numpy().nonzero()):
                 missing_locations.append((row, df.columns[col]))
