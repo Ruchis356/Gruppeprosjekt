@@ -20,16 +20,19 @@ class RefinedData:
         # Initialize an empty list to store missing value locations
         missing_locations = []
 
-        # If there are missing values, print their locations
         if missing_values.any().any():
             # Iterate over the DataFrame to find exact locations
             for row, col in zip(*missing_values.to_numpy().nonzero()):
                 missing_locations.append({'index': row, 'column': df.columns[col]})
-            missing_df = pd.DataFrame(missing_locations) 
-            return missing_df
-        else:
+        missing_df = pd.DataFrame(missing_locations) 
+
+        # If there are missing values, print their locations
+        if missing_df.empty():
             print("No missing values found in the data set! \n")
             return None
+        else:
+            return missing_df
+
 
 
     # ------------------------------------------
@@ -46,7 +49,7 @@ class RefinedData:
 
         Returns:
             pd.DataFrame: A DataFrame with columns 'index' and 'column' indicating the locations of zero values.
-                        Returns an empty DataFrame if no zero values are found.
+            Returns an None if no zero values are found.
         """
 
         # Specifying the coverage columns to check
