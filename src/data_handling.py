@@ -66,11 +66,12 @@ class RefinedData:
                 zero_locations.append({'index': index, 'column': col})
 
         # Convert the list of dictionaries to a DataFrame
-        zero_df = pd.DataFrame(zero_locations, columns=['index', 'column'])
+        zero_df = pd.DataFrame(zero_locations)
 
         # If no zero values are found, print a message and return an empty DataFrame
         if zero_df.empty:
             print("No coverage was poor enough to be excluded.")
+            return None
 
         else:
             return zero_df
