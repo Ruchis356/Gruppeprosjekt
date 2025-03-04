@@ -2,7 +2,6 @@
 
 First: 
 - Finish writing the readme file! (include a short description at the top)
-- Go through assignment, general part and part 1
 - Add missing parts of part 1
 
 
