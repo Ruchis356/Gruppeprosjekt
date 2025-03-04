@@ -1,15 +1,17 @@
 
 
-First: 
-- Finish writing the readme file! (include a short description at the top)
-- Add missing parts of part 1
+
+
+
+Finish writing the readme file! (include a short description at the top)
+
 
 
 
 
 ## Ting vi mangler:
 
-1. Enhetstesting - må skrives for hver fil/notatbok (3 per i dag)
+1. Enhetstesting - må skrives for hver funksjon (4 per i dag)
 - Har enhetstestene beskrivende navn som dokumenterer hva testene gjør?
 - Tas det hensyn til både positive og negative tilfeller?
 - Er testdekningen god nok?
@@ -19,6 +21,7 @@ First:
 
 Bruk unittest eller pytest for testing. Vi burde teste hver "funksjon", dvs get_met, get_nilu, missing_value, og show_zeroes
 
+
 2. Versjonshåndtering/Versjonkontroll - Gå gjennom Git og kommenter hva vi ikke har gjort/skal gjøre fremover i README
 - Er prosjektet underlagt versjonskontroll med sentral repro?
 - Sjekkes det inn jevnlig?
@@ -26,6 +29,7 @@ Bruk unittest eller pytest for testing. Vi burde teste hver "funksjon", dvs get_
 - Har benyttet tags for å merke versjone (?)
 - Har filtrert bort de fleste filer og mapper (?)
 - Gode navngitte branches som sier hva den skal brukes til
+
 
 3. Filhåndtering
     - Leser fra tekstfil
@@ -61,4 +65,4 @@ SELECT * FROM df_weather WHERE Temperature > 20
 result = pysqldf(query)
 print(result)
 
-
+3. Remove hardcoding where possible
