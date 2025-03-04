@@ -16,6 +16,8 @@ class RawData:
     def get_met(self, weather_station, weather_elements, weather_time, weather_resolution):
 
         """
+        Fetch weather data from the Frost API.
+
         Args:
             weather_station (str): The ID of the weather station.
             weather_elements (str): The measurements to include.
@@ -24,6 +26,7 @@ class RawData:
 
         Returns:
             pd.DataFrame: A DataFrame containing the weather data.
+                Returns None if an error occurs.
         """        
 
         try:
