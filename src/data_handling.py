@@ -42,7 +42,7 @@ class RefinedData:
                 return df.fillna(fill_value)
         else:
             print("No missing values found in the data set! \n")
-            return df  # Return the original DataFrame if no missing values are found
+            return None 
 
 
 
