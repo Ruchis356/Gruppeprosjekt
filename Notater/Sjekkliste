@@ -5,6 +5,48 @@ OVERORDNET MÅL: Hente og bruke historisk data om vær og luftkvalitet til å fo
 
 
 
+
+
+Notater fra forelesning om mappen:
+
+Karakteren blir satt ut i fra beste besvarelse = A, og så legges resten av karakterene ut i fra det.
+
+Vi får ikke vurdering på del 1 og 2, bare tilbakemelding (slik at vi kan forbedre til eksamensinnlevering), bedre å levere det vi har enn ikke å levere
+
+Vi skal skrive under på en KI - deklarasjon:
+	- Vi kan bruke KI, men vi må være bevist på bruken og notere ned dette - vi får begynne på en logg
+Vi må også notere hvis vi gjenbruker kode fra nettet. 
+(Dette noteres i readme eller direkte i koden, som vanlig referering)
+
+Versjonshåndtering er viktig. Har vi ikke kontroll på det får vi på det meste C. (Virtual environment osv). Dette ble presentert i begynnelsen av faget. Det burde vi alle lese litt mer om. 
+
+Dokumentasjon er også viktig. “Følger vi prinsippene for å utvikle et system”. Det trenger ikke være komplisert, bare god kvalitet. Dvs at det ikke er om å gjøre å bruke mest data eller gjøre de vanskeligste utregningene, det må være godt kodet, godt dokumentert, robust, og ha god error-handling. 
+
+Enhetstester er for funksjoner. Ha med for de kritiske delene av koden, ikke alt for mange detaljer
+
+Det er bedre å ha store datasett med mangler og feil, så vi viser hvordan vi håndterer dette på en god måte. “Perfekt” data er ikke interessant. 
+
+“Hardkode” vil de ikke se. Dvs. filnavn, og andre slike ting som refererer til *en* spesifikk fil (f eks på en persons pc). Å referere til en fil “i datamappen” slik det er gjort nå er greit. Fleksibilitet er nøkkelen, hvor enkelt er det å bruke og å endre på. Vi kan evt legge inn “filnavn vi lagrer til” som input eller lignende?
+
+På innlevering av Del 1 skal vi “bare svare på spørsmålene i del 1”
+- Det er lurt å skrive en beskrivelse i readme basert på disse spørsmålene, det trenger ikke være langt. (Dette har vi hvert fall begynt på)
+
+De ser historikken, så ikke legg inn noe du vil angre på. De legger vekt på prosessen, å se at vi har lært noe. Så det at vi ikke brukte branches på starten, men gjør det nå, er ikke en negativ ting i forhold til vurderingen. 
+
+Det skal gjerne/helst være én fil i notebooks, og ellers bruke .py filer som ligger i src (slik det er nå). 
+
+Det skal være minimalt med “sjekk av data” dvs. å printe hele datasettet f eks. 
+
+Jeg får inntrykk av at vi ligger godt an, det er gruppe(r) som ikke har kommet seg på GitHub enda. 
+
+
+
+
+
+
+
+
+
 Oppgavetekst: https://rouhani.folk.ntnu.no/textbooks/tdt4114/content/proj_environment/README.html
 Foreslåtte kilder: https://developer.yr.no/ og https://www.eea.europa.eu/en/analysis
 Foreslåtte verktøy og biblioteker: 
