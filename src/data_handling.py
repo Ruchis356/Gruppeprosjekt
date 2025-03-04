@@ -7,11 +7,18 @@ class RefinedData:
     # ------------------------------------------
 
     # Check for missing data points and return a list
-    def missing_data(self, df):
+    def missing_data(self, df, strategy='report', fill_value=None):
 
         """
+        Handle missing values in the DataFrame.
+
         Args:
             df (pd.DataFrame): The DataFrame to check for missing values.
+            strategy (str): How to handle missing values ('report', 'drop', or 'fill').
+            fill_value: The value to use when strategy is 'fill'.
+
+        Returns:
+            pd.DataFrame: The processed DataFrame.
         """
 
         # Check for missing values
@@ -24,7 +31,21 @@ class RefinedData:
             # Iterate over the DataFrame to find exact locations
             for row, col in zip(*missing_values.to_numpy().nonzero()):
                 missing_locations.append({'index': row, 'column': df.columns[col]})
-        missing_df = pd.DataFrame(missing_locations) 
+            missing_df = pd.DataFrame(missing_locations) 
+
+            # Handle missing values based on the strategy
+            if strategy == 'report':
+                print("Missing values found in the data set! \n")
+                return missing_df
+            elif strategy == 'drop':
+                print("Dropping rows with missing values...")
+                return df.dropna()
+            elif strategy == 'fill':
+                print(f"Filling missing values with {fill_value}...")
+                return df.fillna(fill_value)
+        else:
+            print("No missing values found in the data set! \n")
+            return df  # Return the original DataFrame if no missing values are found
 
         # If there are missing values, print their locations
         if missing_df.empty:
