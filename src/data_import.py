@@ -50,7 +50,7 @@ class RawData:
                 data = json_data['data']
                 print('Data collected from frost.met.no!')
             else:
-                print('Error! Statuscode:', r.status_code)
+                print('Error! Statuscode:', response.status_code)
                 print('Message:', json_data['error']['message'])
                 print('Cause:', json_data['error']['reason'])
                 return None
@@ -82,14 +82,19 @@ class RawData:
         # Return an error code if fetching the weather data fails
         except requests.exceptions.ConnectionError:
             print("Error: Failed to connect to the Frost API. Check your internet connection.")
+            return None
         except requests.exceptions.Timeout:
             print("Error: The request to the Frost API timed out. Please try again later.")
+            return None
         except requests.exceptions.HTTPError as e:
             print(f"Error: The Frost API returned an HTTP error: {e}")
+            return None
         except ValueError as e:
             print(f"Error: The Frost API response could not be parsed as JSON: {e}")
+            return None
         except Exception as e:
             print(f"An unexpected error has occured: {e}")
+            return None
 
 
     # ------------------------------------------
