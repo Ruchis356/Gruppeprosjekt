@@ -35,24 +35,14 @@ class RefinedData:
 
             # Handle missing values based on the strategy
             if strategy == 'report':
-                print("Missing values found in the data set! \n")
                 return missing_df
             elif strategy == 'drop':
-                print("Dropping rows with missing values...")
                 return df.dropna()
             elif strategy == 'fill':
-                print(f"Filling missing values with {fill_value}...")
                 return df.fillna(fill_value)
         else:
             print("No missing values found in the data set! \n")
             return df  # Return the original DataFrame if no missing values are found
-
-        # If there are missing values, print their locations
-        if missing_df.empty:
-            print("No missing values found in the data set! \n")
-            return None
-        else:
-            return missing_df
 
 
 
