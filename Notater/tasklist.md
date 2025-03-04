@@ -28,14 +28,11 @@ Bruk unittest eller pytest for testing. Vi burde teste hver "funksjon", dvs get_
 - Har filtrert bort de fleste filer og mapper (?)
 - Gode navngitte branches som sier hva den skal brukes til
 
-3. Utdyp kildereferanser i selve koden(?):
-- Kildereferanser bør inkludere informasjon om kildeautoritet, datakvalitet og tilgjengelighet, og bør presenteres i en klar og konsistent form.
-
-4. Filhåndtering
-- Leser fra tekstfil
-- Begrenset eller ingen sjekk/kontroll av filformat/struktur
-- Enkel håndtering av unntak
-- Skriver til tekstfil
+3. Filhåndtering
+    - Leser fra tekstfil
+    - Begrenset eller ingen sjekk/kontroll av filformat/struktur
+    - Enkel håndtering av unntak
+    - Skriver til tekstfil
 - Lukker filressurser på en trygg måte
 
 
