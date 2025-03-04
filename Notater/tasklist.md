@@ -2,12 +2,46 @@
 
 First: 
 - Merge branches
-- Finish writing the readme file!
+- Finish writing the readme file! (include a short description at the top)
 
 
 
 
-Areas of improvement:
+
+## Ting vi mangler:
+
+1. Enhetstesting - må skrives for hver fil/notatbok (3 per i dag)
+- Har enhetstestene beskrivende navn som dokumenterer hva testene gjør?
+- Tas det hensyn til både positive og negative tilfeller?
+- Er testdekningen god nok?
+- Har gode beskrivende navn på testene
+- Har enhetstester for de viktigste funksjonene
+- Har helt greie negative tester (viser at kandidaten har forstått hovedpoenget med positive/negative tester)
+
+2. Versjonshåndtering/Versjonkontroll - Gå gjennom Git og kommenter hva vi ikke har gjort/skal gjøre fremover i README
+- Er prosjektet underlagt versjonskontroll med sentral repro?
+- Sjekkes det inn jevnlig?
+- Gode commit-meldinger som beskriver kort hvilke endringer som er gjort/hvilke problem som er løst
+- Har benyttet tags for å merke versjone (?)
+- Har filtrert bort de fleste filer og mapper (?)
+
+
+3. Utdyp kildereferanser i selve koden(?):
+- Kildereferanser bør inkludere informasjon om kildeautoritet, datakvalitet og tilgjengelighet, og bør presenteres i en klar og konsistent form.
+
+4. Filhåndtering
+- Leser fra tekstfil
+- Begrenset eller ingen sjekk/kontroll av filformat/struktur
+- Enkel håndtering av unntak
+- Skriver til tekstfil
+- Lukker filressurser på en trygg måte
+
+
+
+
+
+
+## Areas of improvement:
 
 1. Add to main?
 
