@@ -3,7 +3,6 @@
 Begge datasettene er planlagt å utvides til 10 år med daglige gjennomsnitt, men er foreløbig begrenset til en kortere periode for å minske prosesseringstiden mens vi jobber med selve koden. 
 
 
-
 # Miljødataanalyseapplikasjon
 
 ## Project Setup
@@ -17,21 +16,20 @@ Begge datasettene er planlagt å utvides til 10 år med daglige gjennomsnitt, me
 - `data_handling.py`: Contains the `RefinedData` class for processing data.
 - `utils.py`: Contains a collection of simple tools for data handling and visualisation. 
 
-## Evaluation of data sources
-- Frost API (meterologisk institutt): High-quality data from the Norwegian Meteorological Institute, reliable and well-documented.
-- Nilu: Provides detailed air quality data but requires preprocessing.
-
 ## Expected irregularities from environmental data sources
 - Missing values
 - Missing columns or rows
 - Inconsistent date formats
 
+## Evaluation of data sources
+- Frost API (meterologisk institutt): High-quality data from the Norwegian Meteorological Institute, reliable and well-documented.
+- Nilu: Provides detailed air quality data but requires preprocessing.
+
+
+
 
 
 *** DELETE BELOW BEFORE HANDING IN ***
-
-
-
 
 # Hvordan takle de forventede iregularitetene?
 - Inconsistent date formats: Use pd.to_datetime with a specified format.
@@ -39,12 +37,9 @@ Begge datasettene er planlagt å utvides til 10 år med daglige gjennomsnitt, me
 
 
 # kildeautoritet, data kvalitet, tigljengelighet, brukervennlighet, osv.
-
-
-
   - Meterologisk institutt. Kildeautoritet er det viktigste kriteriet. Dette er et statlig institutt som står for meterologisk utforskning og suppler meterologisk data for folkeinformasjon via blant annet yr.no. Tilgjengeligheten er også god, da MI legger ut all meterologisk data via API. Fordi de bruker API er det også relativt brukervennlig. Frost API. Med Frost API har de veiledning og tutorials på hvordan vi kan importere og bruke data fra MI i python spesifikt. 
+  
+  - Nilu (Tidligere norsk institutt for luftforskning) for miljødata. Nonprofit og uavhengig. Forskningsinstitutt. Brukervennlig. De har eksistert i flere tiår og utviklet seg over tid. 
 
-    - Nilu (Tidligere norsk institutt for luftforskning) for miljødata. Nonprofit og uavhengig. Forskningsinstitutt. Brukervennlig. De har eksistert i flere tiår og utviklet seg over tid. 
-
-    Hensikten med å velge disse kildene er å sammenligne dataene med hverandre. Ved å samle inn værdata fra Meteorologisk institutt, samt data om luftforurensning fra samme tidsperiode, ønsker vi å utforske et mønster i korrelasjonen mellom disse datasettene. Vi ønsker å se på data fra perioden 2010 til 2020. Disse dataene vil vi bruke til å lage prediksjoner og sammenligne dem med den faktiske trenden for værdata og luftkvalitet fra 2020 til 2025.
+  Hensikten med å velge disse kildene er å sammenligne dataene med hverandre. Ved å samle inn værdata fra Meteorologisk institutt, samt data om luftforurensning fra samme tidsperiode, ønsker vi å utforske et mønster i korrelasjonen mellom disse datasettene. Vi ønsker å se på data fra perioden 2010 til 2020. Disse dataene vil vi bruke til å lage prediksjoner og sammenligne dem med den faktiske trenden for værdata og luftkvalitet fra 2020 til 2025.
 
