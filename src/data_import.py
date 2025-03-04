@@ -31,7 +31,8 @@ class RawData:
 
         try:
             # Client ID to access data from Frost API
-            client_id = 'd933f861-70f3-4d0f-adc6-b1edb5978a9e'
+            #client_id = 'd933f861-70f3-4d0f-adc6-b1edb5978a9e'
+            client_id = 'f0cfe822-6d2c-4d3c-80f8-cbf38b0c15a9'
 
             # Define endpoints and parameters
             endpoint = 'https://frost.met.no/observations/v0.jsonld'
