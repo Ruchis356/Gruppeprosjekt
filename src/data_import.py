@@ -101,7 +101,7 @@ class RawData:
 
 
     # ------------------------------------------
-    # WAIR QUALITY DATA - IMPORT
+    # AIR QUALITY DATA - IMPORT
     # ------------------------------------------
 
     # Fetch air quality data by Nilu from a CSV file
