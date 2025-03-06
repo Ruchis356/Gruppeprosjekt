@@ -1,0 +1,260 @@
+*** Indikerer at dette punktet er ferdigstilt eller gjennomført
+
+
+OVERORDNET MÅL: Hente og bruke historisk data om vær og luftkvalitet til å forutsi hvordan luftkvaliteten utvikler seg de neste dagene basert på været den siste tiden. 
+
+
+
+
+
+Notater fra forelesning om mappen:
+
+Karakteren blir satt ut i fra beste besvarelse = A, og så legges resten av karakterene ut i fra det.
+
+Vi får ikke vurdering på del 1 og 2, bare tilbakemelding (slik at vi kan forbedre til eksamensinnlevering), bedre å levere det vi har enn ikke å levere
+
+Vi skal skrive under på en KI - deklarasjon:
+	- Vi kan bruke KI, men vi må være bevist på bruken og notere ned dette - vi får begynne på en logg
+Vi må også notere hvis vi gjenbruker kode fra nettet. 
+(Dette noteres i readme eller direkte i koden, som vanlig referering)
+
+Versjonshåndtering er viktig. Har vi ikke kontroll på det får vi på det meste C. (Virtual environment osv). Dette ble presentert i begynnelsen av faget. Det burde vi alle lese litt mer om. 
+
+Dokumentasjon er også viktig. “Følger vi prinsippene for å utvikle et system”. Det trenger ikke være komplisert, bare god kvalitet. Dvs at det ikke er om å gjøre å bruke mest data eller gjøre de vanskeligste utregningene, det må være godt kodet, godt dokumentert, robust, og ha god error-handling. 
+
+Enhetstester er for funksjoner. Ha med for de kritiske delene av koden, ikke alt for mange detaljer
+
+Det er bedre å ha store datasett med mangler og feil, så vi viser hvordan vi håndterer dette på en god måte. “Perfekt” data er ikke interessant. 
+
+“Hardkode” vil de ikke se. Dvs. filnavn, og andre slike ting som refererer til *en* spesifikk fil (f eks på en persons pc). Å referere til en fil “i datamappen” slik det er gjort nå er greit. Fleksibilitet er nøkkelen, hvor enkelt er det å bruke og å endre på. Vi kan evt legge inn “filnavn vi lagrer til” som input eller lignende?
+
+På innlevering av Del 1 skal vi “bare svare på spørsmålene i del 1”
+- Det er lurt å skrive en beskrivelse i readme basert på disse spørsmålene, det trenger ikke være langt. (Dette har vi hvert fall begynt på)
+
+De ser historikken, så ikke legg inn noe du vil angre på. De legger vekt på prosessen, å se at vi har lært noe. Så det at vi ikke brukte branches på starten, men gjør det nå, er ikke en negativ ting i forhold til vurderingen. 
+
+Det skal gjerne/helst være én fil i notebooks, og ellers bruke .py filer som ligger i src (slik det er nå). 
+
+Det skal være minimalt med “sjekk av data” dvs. å printe hele datasettet f eks. 
+
+Jeg får inntrykk av at vi ligger godt an, det er gruppe(r) som ikke har kommet seg på GitHub enda. 
+
+
+
+
+
+
+
+
+
+Oppgavetekst: https://rouhani.folk.ntnu.no/textbooks/tdt4114/content/proj_environment/README.html
+Foreslåtte kilder: https://developer.yr.no/ og https://www.eea.europa.eu/en/analysis
+Foreslåtte verktøy og biblioteker: 
+ - Python
+ - Jupyter Notebook
+ - Pandas (for databehandling)
+ - NumPy (for numeriske beregninger)
+ - Matplotlib/Seaborn/Plotly (for visualisering)
+ - Pandas SQL
+
+
+
+
+Tidsplan:
+Uke 6-7: Oppsett av utviklingsmiljø og datainnsamling
+Uke 8-11: Databehandling og analyse
+Uke 12-14: Visualisering og prediktiv analyse
+Uke 15: Testing og dokumentasjon
+
+
+
+Kilder vi bruker:
+https://seklima.met.no/stations/
+
+https://www.met.no/frie-meteorologiske-data/frie-meteorologiske-data
+
+
+
+Oppgave 2: Datainnsamling
+ - Identifiser relevante åpne datakilder (Kilde: Nilu, Data: Luftkvalitet - Kilde:Meterologisk institutt, Data: Vær)
+*** - Implementere funksjonalitet for å hente data fra disse kildene ved hjelp av Python-moduler som requests
+ - For å integrere dataene i applikasjonen: tekstfiler, CSV-filer, JSON-data, samt fil- og katalogadministrasjon. 
+ - Bruk list comprehensions, iteratorer og Pandas SQL (sqldf) for å utforske og forstå dataenes struktur og innhold før de forberedes for videre analyse.
+
+Vurderingskriterier:
+ 1) Hvilke åpne datakilder er identifisert som relevante for miljødata, og hva er kriteriene (f.eks. kildeautoritet, datakvalitet, tilgjengelighet, brukervennlighet osv.) for å vurdere deres pålitelighet og kvalitet?
+
+  SVAR:
+    
+    Dette er en oversikt pa datakildene vi har valgt med begrunnelse: 
+
+    - Meterologisk institutt. Kildeautoritet er det viktigste kriteriet. Dette er et statlig institutt som står for meterologisk utforskning og suppler meterologisk data for folkeinformasjon via blant annet yr.no. Tilgjengeligheten er også god, da MI legger ut all meterologisk data via API. Fordi de bruker API er det også relativt brukervennlig. Frost API. Med Frost API har de veiledning og tutorials på hvordan vi kan importere og bruke data fra MI i python spesifikt. 
+
+    - Nilu (Tidligere norsk institutt for luftforskning) for miljødata. Nonprofit og uavhengig. Forskningsinstitutt. Brukervennlig. De har eksistert i flere tiår og utviklet seg over tid. 
+
+    Hensikten med å velge disse kildene er å sammenligne dataene med hverandre. Ved å samle inn værdata fra Meteorologisk institutt, samt data om luftforurensning fra samme tidsperiode, ønsker vi å utforske et mønster i korrelasjonen mellom disse datasettene. Vi ønsker å se på data fra perioden 2010 til 2020. Disse dataene vil vi bruke til å lage prediksjoner og sammenligne dem med den faktiske trenden for værdata og luftkvalitet fra 2020 til 2025.
+
+
+ 2)Hvilke teknikker (f.eks. håndtering av CSV-filer, JSON-data) er valgt å bruke for å lese inn dataene, og hvordan påvirker disse valgene datakvaliteten og prosessen videre?
+
+
+
+ 3) Dersom det er brukt API-er, hvilke spesifikke API-er er valgt å bruke, og hva er de viktigste dataene som kan hentes fra disse kildene?
+
+ - For a hente ut data fra metrologisk institutt bruker vi API frost..
+
+
+Oppgave 3: Databehandling
+ - Utvikle funksjoner som renser og formaterer de innsamlede dataene
+ - Fokuser på håndtering av manglende verdier og uregelmessigheter ved hjelp av Pandas
+ - benytte teknikker som list comprehensions, iteratorer, pandas og pandas sql (sqldf) for å manipulere dataene effektivt
+
+Vurderingskriterier:
+ - Hvilke metoder vil du bruke for å identifisere og håndtere manglende verdier i datasettet?
+ - Kan du gi et eksempel på hvordan du vil bruke list comprehensions for å manipulere dataene?
+ - Hvordan kan Pandas SQL (sqldf) forbedre datamanipuleringen sammenlignet med tradisjonelle Pandas-operasjoner?
+ - Hvilke spesifikke uregelmessigheter i dataene forventer du å møte, og hvordan planlegger du å håndtere dem?
+
+
+Oppgave 4: Dataanalyse
+ - Bruk verktøy som NumPy, Pandas, Matplotlib osv
+ - Beregne statistiske mål som gjennomsnitt, median og standardavvik
+ - Implementer enkle statistiske analyser for å avdekke mønstre i dataene
+
+Vurderingskriterier:
+ - Hvordan kan du bruke NumPy og Pandas til å beregne gjennomsnitt, median og standardavvik for de innsamlede dataene, og hvorfor er disse statistiske målene viktige?
+ - Kan du gi et eksempel på hvordan du vil implementere en enkel statistisk analyse for å undersøke sammenhengen mellom to variabler i datasettet?
+ - Hvordan planlegger du å håndtere eventuelle skjevheter i dataene under analysen, og hvilke metoder vil du bruke for å sikre at analysen er pålitelig?
+ - Hvilke visualiseringer vil du lage for å støtte analysen din, og hvordan vil disse visualiseringene hjelpe deg med å formidle funnene dine?
+
+
+Oppgave 5: Visualisering
+ - Bruk Matplotlib og Seaborn for å skape visualiseringer av de analyserte miljødataene
+ - Utvikle grafer og diagrammer som illustrerer endringer i luftkvalitet over tid, sammenligning av temperaturdata, og andre relevante trender
+- Utforsk muligheten for å lage interaktive visualiseringer ved hjelp av Widgets, Plotly eller Bokeh dersom tiden tillater det
+
+Vurderingskriterier:
+ - Hvilke spesifikke typer visualiseringer planlegger du å lage for å representere endringer i luftkvalitet og temperaturdata, og hvorfor valgte du disse?
+ - Hvordan kan Matplotlib og Seaborn brukes til å forbedre forståelsen av de analyserte dataene, og hvilke funksjoner i disse bibliotekene vil være mest nyttige?
+ - Hvordan vil du håndtere og visualisere manglende data i grafene dine for å sikre at de fortsatt er informative?
+ - Kan du beskrive prosessen for å lage interaktive visualiseringer med Widgets, Plotly eller Bokeh, og hvilke fordeler dette kan gi i forhold til statiske visualiseringer?
+ - Hvordan vil du evaluere effektiviteten av visualiseringene dine i å formidle de viktigste funnene fra dataanalysen til et bredere publikum?
+
+
+Oppgave 6: Prediktiv analyse
+ - Prediktiv analyse 
+ - Implementeringen av lineær regresjon ved hjelp av scikit-learn, for å forutsi fremtidige miljøforhold basert på historiske data
+ - Forberede dataene ved å identifisere relevante funksjoner og målvariabler, samt håndtere eventuelle manglende verdier som kan påvirke modellens nøyaktighet
+ - Tren regresjonsmodellen på de rensede dataene, evaluere dens ytelse ved hjelp av passende metoder som beregning av feilmål, og til slutt bruke modellen til å lage prediksjoner for fremtidige miljøforhold
+
+Vurderingskriterier:
+ - Lag minst tre forskjellige typer visualiseringer (f.eks. linjediagrammer, søylediagrammer og scatterplots) for å representere endringer i luftkvalitet og temperaturdata over tid. Forklar valget av visualiseringstype for hver graf.
+ - Implementer visualiseringer ved hjelp av Matplotlib og Seaborn. Inkluder tilpassede akser, titler, og fargepaletter for å forbedre lesbarheten og estetikk.
+ - Demonstrer hvordan manglende data håndteres i visualiseringene. Lag en graf som viser hvordan manglende verdier påvirker datatrender, og diskuter hvordan dette kan påvirke tolkningen av dataene.
+ - Skriv en kort evaluering av de utviklede visualiseringene. Diskuter hvilke visualiseringer som var mest effektive for å formidle informasjon, og hvorfor. Reflekter over tilbakemeldinger fra medstudenter eller veileder.
+
+
+Oppgave 7: Refleksjonsnotat
+ - Skriv et refleksjonsnotat (maks 800 ord)
+
+Vurderingskriterier:
+ - Refleksjoner over hva du har lært om datainnsamling, databehandling, dataanalyse og visualisering.
+ - Beskrivelse av nye ferdigheter som ble tilegnet, for eksempel bruk av spesifikke biblioteker (Pandas, NumPy, Matplotlib, etc.) og programmeringskonsepter.
+ - Identifisering av spesifikke utfordringer som oppstod under prosjektet, for eksempel problemer med datakvalitet, håndtering av manglende verdier, eller tekniske problemer med API-er.
+ - Refleksjoner over samarbeidet i gruppen, inkludert hvordan oppgaver ble fordelt og hvordan kommunikasjonen fungerte.
+ - Vurdering av de endelige resultatene, inkludert kvaliteten på visualiseringene og analysene.
+ - Ideer til hvordan prosjektet kan forbedres i fremtiden, både i forhold til tekniske aspekter og prosjektledelse.
+ - Mulige retninger for videre forskning eller utvikling basert på erfaringene fra prosjektet.
+ - Oppsummering av de viktigste læringspunktene og hvordan prosjektet har bidratt til studentenes forståelse av datavitenskap og miljøstudier.
+ - Personlige tanker om hvordan erfaringene fra prosjektet kan anvendes i fremtidige studier eller yrkesliv.
+
+
+
+
+
+Krav:
+ - Positive og negative enhetstester (unittest-rammeverket)
+   - Har enhetstestene beskrivende navn som dokumenterer hva testene gjør?
+   - Tas det hensyn til både positive og negative tilfeller?
+   - Er testdekningen god nok?
+ - Git, versjonshåndtering, og grener
+   - Er prosjektet underlagt versjonskontroll med sentral repro?
+   - Sjekkes det inn jevnlig?
+   - Beskriver commit-meldingene endringene på en kort og konsis måte?
+ - Dokumentasjon
+   - Standard for kodestil (PEP 8)
+   - Riktig og konsistent bruk av innrykk, variabelnavn, kommentarer
+   - Tydelig inkludere kildereferanser (kildeautoritet, datakvalitet og tilgjengelighet)
+   - Er all kode og annen prosjektdokumentasjon godt dokumentert, med tydelige forklaringer og kildereferanser?
+   - Følger anbefalte standarder, som PEP 8 for Python for kodestil?
+   - Dokumenterer hvor dataene kommer fra, inkludert API-er og åpne datakilder?
+
+
+
+
+Vurderingskriterier:
+
+1. Kvaliteten på datainnsamlingen og forberedelsen: Vurderingen av datainnsamlingen vil fokusere på hvor godt dere har identifisert relevante og pålitelige åpne datakilder. Det vil også bli vurdert hvordan dere har implementert funksjonalitet for å hente data ved hjelp av Python-moduler, samt deres evne til å håndtere ulike datatyper som tekstfiler, CSV og JSON. Kvaliteten på databehandlingen, inkludert rensing og formatering av dataene, samt håndtering av manglende verdier og uregelmessigheter, vil også være sentral i vurderingen.
+ - Identifiserer relevante og pålitelige åpne datakilder
+ - Implementerer funksjonalitet for å hente data ved hjelp av Python-moduler
+ - Håndterer ulike datatyper som tekstfiler, CSV og JSON
+ - Sikre god kvalitet på databehandlingen, herunder:
+ - Renser og formatere dataene korrekt
+ - Håndterer manglende verdier og uregelmessigheter på en hensiktsmessig måte
+
+2. Dyktighet i dataanalyse og bruk av statistiske metoder:
+Dette kriteriet vurderer deres evne til å anvende NumPy og Pandas for å analysere dataene. Det vil bli sett på hvor godt dere kan beregne statistiske mål som gjennomsnitt, median og standardavvik. Anvender NumPy og Pandas for å analysere dataene.
+Beregner statistiske mål som:
+ - Gjennomsnitt
+ - Median
+ - Standardavvik
+
+3. Kvaliteten og klarheten i visualiseringene: Vurderingen av visualiseringene vil fokusere på brukt av Matplotlib, Seaborn, Plotly eller Bokeh for å presentere dataene. Kvaliteten på visualiseringene vil bli vurdert ut fra hvor godt dere kommuniserer informasjon, inkludert bruk av passende diagramtyper, fargevalg, aksetitler og legender.
+ - Bruker visualiseringsbiblioteker som Matplotlib, Seaborn, Plotly eller Bokeh for å presentere dataene
+ - Kvalitet på visualiseringene, herunder:
+   - Bruk av passende diagramtyper
+   - Fargevalg
+   - Aksetitler
+   - Legender
+ - Klarhet i visualiseringene for å kommunisere informasjon på en informativ og lettfattelig måte for målgruppen
+
+4. Versjonskontroll
+ - Lokalt/sentralt repo, commits og branching:
+   - Prosjektet har sentralt repo (GitHub/GitLab)
+   - Fornuftig jevnlig innsjekking (commit) av endringer
+   - Gode commit-meldinger som beskriver kort hvilke endringer som er gjort/hvilke problem som er løst
+   - Har benyttet greiner som del av arbeidsflyt (f.eks. develop/main), for features/utprøving og liknende.
+   - Har gjennomført merge mellom greiner
+   - Har benyttet tags for å merke versjoner
+ - Filer lagt til versjonskontroll
+   - Benytter .gitignore
+   - Har filtrert bort de fleste filer og mapper
+   - Benytter .gitignore
+   - Har opprettet README.md-fil som gir en kort beskrivelse av prosjektet, og info om hvordan bygge og kjøre applikasjonen
+
+5. Enhetstesting
+ - Har gode beskrivende navn på testene
+ - Har enhetstester for de viktigste funksjonene
+ - Har helt greie negative tester (viser at kandidaten har forstått hovedpoenget med positive/negative tester)
+
+6. Filhåndtering
+ - Leser fra tekstfil
+ - Begrenset eller ingen sjekk/kontroll av filformat/struktur
+ - Enkel håndtering av unntak
+ - Skriver til tekstfil
+ - Lukker filressurser på en trygg måte
+
+
+
+
+
+
+COMPLETE
+*** Oppgave 1: Sett opp utviklingsmiljø
+*** - Opprett et nytt «repository» på GitHub med et beskrivende navn for prosjektet (f.eks. “Miljødataanalyseapplikasjon”).
+*** - Last ned og installer den nyeste versjonen av Python fra den offisielle nettsiden (https://www.python.org/downloads/). Sørg for at Python er lagt til i systemets PATH under installasjonen.
+*** - Last ned og installer Visual Studio Code fra den offisielle nettsiden (https://code.visualstudio.com/). Åpne VSCode og installer nødvendige utvidelser for Python og Jupyter. Dette kan gjøres ved å gå til Extensions (Ctrl+Shift+X) og søke etter “Python” og “Jupyter”.
+*** - Klon dette «repository»-et til din lokale maskin ved hjelp av Git (eller utviklingsverktøyet ditt).
+*** - I VSCode, opprett en ny Jupyter Notebook-fil (med filendelsen «.ipynb») i prosjektmappen. Skriv og kjør følgende kode i den første cellen for å teste at miljøet fungerer som det skal:
+
+
