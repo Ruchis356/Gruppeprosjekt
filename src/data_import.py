@@ -124,6 +124,8 @@ class RawData:
                 encoding='utf-8',  
                 on_bad_lines='skip'  
             )
+
+            df.close()
         
             # Convert the 'Tid' column to a date-time format
             df['Tid'] = pd.to_datetime(df['Tid'], format='%d.%m.%Y %H:%M')
