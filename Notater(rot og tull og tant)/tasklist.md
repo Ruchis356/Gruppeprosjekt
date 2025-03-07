@@ -1,8 +1,6 @@
 
 Har filtrert bort de fleste filer og mapper (?)
 
-Lukker filressurser på en trygg måte
-
 Remove hardcoding where possible
 
 
