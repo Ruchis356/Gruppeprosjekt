@@ -117,13 +117,13 @@ class RawData:
         """
 
         try:
-            df = pd.read_csv(
-                file_path,
-                skiprows=3,  
-                sep=';',  
-                encoding='utf-8',  
-                on_bad_lines='skip'  
-            )
+            with open(file_path, 'r', encoding='utf-8') as file:
+                df = pd.read_csv(
+                    file,
+                    skiprows=3,  
+                    sep=';',    
+                    on_bad_lines='skip'  
+                )
         
             # Convert the 'Tid' column to a date-time format
             df['Tid'] = pd.to_datetime(df['Tid'], format='%d.%m.%Y %H:%M')
@@ -151,7 +151,7 @@ class RawData:
             print('There are ', df.shape[0], 'lines of data in this dataframe.\n')
             self.df = df
 
-            df.close()
+            #df.close()
 
             #Returns dataframe upon request        
             return(df)
