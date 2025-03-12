@@ -64,7 +64,7 @@ class RefinedData:
         """
 
         # Specifying the coverage columns to check
-        columns_to_check = ['Dekning', 'Dekning.1', 'Dekning.2', 'Dekning.3', 'Dekning.4']
+        columns_to_check = df.columns[df.columns.str.contains('Dekning', case=False)]
 
         # Initialize an empty list to store zero value locations
         zero_locations = []
