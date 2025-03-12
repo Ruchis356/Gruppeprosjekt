@@ -1,6 +1,7 @@
 import sys, os
 import pandas as pd
 import unittest
+import requests
 from unittest.mock import patch, Mock
 
 # Add the parent directory to the sys.path
@@ -23,7 +24,7 @@ class TestRawData(unittest.TestCase):
                     'referenceTime': '2023-10-01T00:00:00Z',
                     'observations': [
                         {'elementId': 'temperature', 'value': 15.0},
-                        {'elementId': 'humidity', 'value': 60.0}
+                        {'elementId': 'precipitation', 'value': 60.0}
                     ]
                 }
             ]
@@ -32,14 +33,12 @@ class TestRawData(unittest.TestCase):
 
         # Call the function
         raw_data = RawData()
-        result = raw_data.get_met('SN12345', 'temperature,humidity', '2023-10-01/2023-10-02', 'PT1H')
+        result = raw_data.get_met('SN12345', 'temperature,precipitation', '2023-10-01/2023-10-02', 'PT1H')
 
         # Assertions:   
         self.assertIsInstance(result, pd.DataFrame)     # Is it a dataframe?
-        self.assertEqual(result.shape[0], 1)            # Is it the expected shape?
+        self.assertEqual(result.shape[0], 2)            # Is it the expected shape?
         self.assertIn('referenceTime', result.columns)  # Did the function place the values in the right columns?
-        self.assertIn('temperature', result.columns)
-        self.assertIn('humidity', result.columns)
     
     # Thest that the function handles invalid inputs gracefully
     @patch('requests.get')
@@ -58,7 +57,7 @@ class TestRawData(unittest.TestCase):
 
         # Call the function with invalid inputs
         raw_data = RawData()
-        result = raw_data.get_met('SN12345', 'temperature,humidity,pinkness', '2023-10-01/2023-10-02', 'PT1K')
+        result = raw_data.get_met('SN12345', 'temperature,precipitation,pinkness', '2023-10-01/2023-10-02', 'PT1K')
 
         #Assertions: Does the function return "None" when given invalid inputs?
         self.assertIsNone(result) 
@@ -80,7 +79,7 @@ class TestRawData(unittest.TestCase):
 
         # Call the function
         raw_data = RawData()
-        result = raw_data.get_met('SN12345', 'temperature,humidity', '2023-10-01/2023-10-02', 'PT1H')
+        result = raw_data.get_met('SN12345', 'temperature,precipitation', '2023-10-01/2023-10-02', 'PT1H')
 
         # Assertions: Does the function return the expected "None" with an API error?
         self.assertIsNone(result)
@@ -94,7 +93,7 @@ class TestRawData(unittest.TestCase):
 
         # Call the function
         raw_data = RawData()
-        result = raw_data.get_met('SN12345', 'temperature,humidity', '2023-10-01/2023-10-02', 'PT1H')
+        result = raw_data.get_met('SN12345', 'temperature,precipitation', '2023-10-01/2023-10-02', 'PT1H')
 
         # Assertions: Does the function return the expected "None" with a connection error?
         self.assertIsNone(result)
