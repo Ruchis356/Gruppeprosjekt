@@ -1,0 +1,64 @@
+
+Spørsmål:
+1. Sjekk om å bruke værdata og luftkvalitetdata for å forutsi fremtidig luftkvalitet er noe ala det de forventer. Burde vi gjøre mer? Mindre? Noe helt annet? 
+    (altså er dette overordnede målet et godt svar på oppgaven: Hente og bruke historisk data om vær og luftkvalitet til å forutsi hvordan luftkvaliteten utvikler seg de neste dagene basert på været den siste tiden. )
+2. Hvor mye data er det forventet at vi behandler? Er 10 år med daglige gjennomsnitt (nedbør, vind, luftkvalitet, o.l.) en passende mengde? Vi blir å behandle rundt 3650 datoer med 6 datapunkter hver med den planen vi har nå. 
+3. Hva er egentlig forskjellen på en jupyter notebook og en .py fil? Når vi jobber gjennom GitHub, hva har jupyter som py ikke har? Skal vi bare bruke jupyter notebooks og ingen .py filer?
+
+
+
+
+Har filtrert bort de fleste filer og mapper (?)
+
+Remove hardcoding where possible
+
+
+
+
+
+BARE ROT:
+
+
+Use qgrid for interactive dataframes?
+
+
+import unittest
+import sys, os
+
+# Add the parent directory of 'notebooks' to the sys.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), 'src')))
+
+
+from DeckOfCards import DeckOfCards
+from HandOfCards import HandOfCards
+# Skriv din kode her:
+...```
+
+client ID: f0cfe822-6d2c-4d3c-80f8-cbf38b0c15a9
+
+client secret: client_id = b8950f6f-769e-4fd6-b658-0be1b21fbff8
+
+
+
+
+## Areas of improvement:
+
+1. Use list comprehensions to simplify some code?
+
+Instead of a for loop:
+zero_indices = [index for index in df.index if df.loc[index, col] == 0]
+
+Look for other opportunities to replace loops with list comprehensions 
+(e.g., when creating lists or filtering data)
+
+
+2. pandasql to manipulate data with SQL-like queries?
+
+from pandasql import sqldf
+pysqldf = lambda q: sqldf(q, globals())
+
+query = """
+SELECT * FROM df_weather WHERE Temperature > 20
+"""
+result = pysqldf(query)
+print(result)
