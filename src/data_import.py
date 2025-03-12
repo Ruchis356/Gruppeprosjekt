@@ -30,6 +30,25 @@ class RawData:
         """        
 
         try:
+
+            # Validate the arguments given to the function
+            if not weather_station or not weather_elements or not weather_time or not weather_resolution:
+                raise ValueError("All input parameters must be provided.")
+
+            if not isinstance(weather_station, str):
+                raise ValueError("weather_station must be a string.")
+
+            if not isinstance(weather_elements, str):
+                raise ValueError("weather_elements must be a string.")
+
+            if not isinstance(weather_time, str):
+                raise ValueError("weather_time must be a string.")
+
+            if not isinstance(weather_resolution, str):
+                raise ValueError("weather_resolution must be a string.")
+
+            # If the arguments are valid, proceed with the API request
+
             # Client ID to access data from Frost API
             client_id = 'd933f861-70f3-4d0f-adc6-b1edb5978a9e'
 
@@ -76,13 +95,16 @@ class RawData:
             # Remove time portion from 'referenceTime' (keep only 'YYYY-MM-DD')
             df["referenceTime"] = df["referenceTime"].str.split("T").str[0]
 
-            print('There are ', df.shape[0], 'lines of data in this dataframe.\n')
+            print('There are ', df.shape[0]-1, 'lines of data in this dataframe.\n')
             self.df = df
 
             #Returns dataframe upon request
             return(df)
         
         # Return an error code if fetching the weather data fails
+        except ValueError as e:
+            print(f"Invalid input: {e}")
+            return None
         except requests.exceptions.ConnectionError:
             print("Error: Failed to connect to the Frost API. Check your internet connection.")
             return None
@@ -91,9 +113,6 @@ class RawData:
             return None
         except requests.exceptions.HTTPError as e:
             print(f"Error: The Frost API returned an HTTP error: {e}")
-            return None
-        except ValueError as e:
-            print(f"Error: The Frost API response could not be parsed as JSON: {e}")
             return None
         except Exception as e:
             print(f"An unexpected error has occured: {e}")
@@ -125,6 +144,8 @@ class RawData:
                     on_bad_lines='skip'  
                 )
         
+                print(f"CSV file read successfully: {df.head()}") #Just for error testing
+
             # Convert the 'Tid' column to a date-time format
             df['Tid'] = pd.to_datetime(df['Tid'], format='%d.%m.%Y %H:%M')
             time_column = 'Tid' 
