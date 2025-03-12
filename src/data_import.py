@@ -143,8 +143,6 @@ class RawData:
                     sep=';',    
                     on_bad_lines='skip'  
                 )
-        
-                print(f"CSV file read successfully: {df.head()}") #Just for error testing
 
             # Convert the 'Tid' column to a date-time format
             df['Tid'] = pd.to_datetime(df['Tid'], format='%d.%m.%Y %H:%M')
