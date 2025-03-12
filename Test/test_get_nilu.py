@@ -1,3 +1,7 @@
+# Possible further testing?
+    # Empty CSV file
+    # CSV file with missing/incomplete data
+
 import unittest
 import sys, os
 import pandas as pd
@@ -7,18 +11,16 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 
 from data_import import RawData
 
-# Successful CSV read: Test that the function correctly reads a CSV file and returns a dataframe.
-# Error handling: Test how the function handles some errors (file not found, parsing, other exceptions)
-# Dataframe structure: Test that the returned DataFrame has the expected structure
-# Threshold: Test that the function correctlt applies the threshold method to the coverage columns
-
 class TestRawData(unittest.TestCase):
 
     # Test that the function is able to read a csv file, and creates the expected dataframe
     def test_get_nilu_success(self):
 
         # Create a temporary (mock) CSV file
-        csv_content = """Tid;Dekning;Dekning.1;Dekning.2;Dekning.3;Dekning.4
+        csv_content = """Header 1
+Header 2
+Header 3
+Tid;Dekning;Dekning.1;Dekning.2;Dekning.3;Dekning.4
 01.10.2023 00:00;100;90;80;70;60
 02.10.2023 00:00;50;40;30;20;10"""
         file_path = 'test_nilu.csv'
@@ -50,7 +52,7 @@ class TestRawData(unittest.TestCase):
         # Assertions: Does the 
         self.assertIsNone(result)
 
-    # Check if the function handles a bad CSV file gracefully
+    # Check if the function handles a malformed CSV file gracefully
     def test_get_nilu_parsing_error(self):
 
         # Create a malformed CSV file
