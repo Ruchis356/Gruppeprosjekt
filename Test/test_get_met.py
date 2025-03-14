@@ -1,222 +1,107 @@
-import unittest
 import sys, os
-
-# Add the parent directory of 'notebooks' to the sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from DeckOfCards import DeckOfCards
-
-
-#Check if the deck is created with 52 cards
-class TestDeckOfCards(unittest.TestCase):
-    def test_deck_init(self):
-        deck=DeckOfCards()
-        self.assertEqual(len(deck.cards), 52) 
-
-#Check if the hand is dealt 5 cards
-    def test_deal_hand(self):
-        deck = DeckOfCards()
-        hand = deck.deal_hand(5)
-        self.assertEqual(len(hand.cards), 5)
-
-#Check if dealing more cards than are in the deck raises an error
-    def test_deal_hand_too_many_cards(self):
-        deck = DeckOfCards()
-        with self.assertRaises(ValueError):
-            deck.deal_hand(53)
-
-#Check to see if all the cards dealt are unique
-    def test_deal_hand_unique_cards(self):
-        deck = DeckOfCards()
-        hand = deck.deal_hand(5)
-        unique_cards = set(hand.cards)
-        self.assertEqual(len(unique_cards), len(hand.cards))
-
-#Check that the hand dealt is a string representation, and not empty
-    def test_str_representation(self):
-        deck = DeckOfCards()
-        deck_str = str(deck)
-        self.assertIsInstance(deck_str, str) 
-        self.assertGreater(len(deck_str), 0)
-
-if __name__ == "__main__":
-    unittest.main()
-
-
-
-
-
-
-
-
-
-
-
-    ****
-
-
-
-
-
-
+import pandas as pd
 import unittest
-import sys, os
+import requests
+from unittest.mock import patch, Mock
 
-# Add the parent directory of 'notebooks' to the sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Add the parent directory to the sys.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
-from HandOfCards import HandOfCards
-from PlayingCard import PlayingCard
+from data_import import RawData
 
-#A test-set of cards
-cards = [
-    PlayingCard("H", 10),  # 10 of Hearts
-    PlayingCard("D", 11),   # Jack of Diamonds
-    PlayingCard("S", 12),   # Queen of Spades
-    PlayingCard("C", 13),   # King of Clubs
-    PlayingCard("H", 1)    # Ace of Hearts
-    ]
+class TestRawData(unittest.TestCase):
 
-#Test that the hand is initialized with a correct number of cards, correctly
-class TestHandOfCards(unittest.TestCase):
-    def test_hand_initialization(self):
-        hand = HandOfCards(cards)
-        self.assertEqual(len(hand.cards), 5)
+    # Test that the function correctly fetches data and returns a DataFrame with the expected parameters
+    @patch('requests.get')
+    def test_get_met_success(self, mock_get):
 
-#Test that it actually catches a flush
-    def test_is_flush_true(self):
-        flush_cards = [
-            PlayingCard("H", 10),  # 10 of Hearts
-            PlayingCard("H", 11),   # Jack of Hearts
-            PlayingCard("H", 12),   # Queen of Hearts
-            PlayingCard("H", 13),   # King of Hearts
-            PlayingCard("H", 1)    # Ace of Hearts
-        ]
-        hand = HandOfCards(flush_cards)
-        self.assertTrue(hand.is_flush()) 
+        # The following codeblock was generated with the assistance of AI (reused for later code blocks)
+        # - Purpose: Creating a functioning mock API response
+        # - AI-tool: DeepSeek
 
-#Test that it returns false when it is not a flush
-    def test_is_flush_false(self):
-        hand = HandOfCards(cards)
-        self.assertFalse(hand.is_flush()) 
-
-#Test for the "return Heart cards" function to see if it returns the correct cards       
-    def test_is_hearts_with_hearts(self):
-        hand = HandOfCards(cards)
-        self.assertEqual(hand.is_hearts(), "H10 H1")
-
-#Test for a False result when there are no Hearts
-    def test_is_hearts_no_hearts(self):
-        no_heart_cards = [
-            PlayingCard("C", 10),  # 10 of Hearts
-            PlayingCard("D", 11),   # Jack of Diamonds
-            PlayingCard("S", 12),   # Queen of Spades
-            PlayingCard("C", 13),   # King of Clubs
-            PlayingCard("D", 1)    # Ace of Hearts
+        # Creating a mock API response
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'data': [
+                {
+                    'referenceTime': '2023-10-01T00:00:00Z',
+                    'observations': [
+                        {'elementId': 'temperature', 'value': 15.0},
+                        {'elementId': 'precipitation', 'value': 60.0}
+                    ]
+                }
             ]
-        hand = HandOfCards(no_heart_cards)
-        self.assertFalse(hand.is_hearts()) 
+        }
+        mock_get.return_value = mock_response
 
-#Test that it counts the points correctly
-    def test_count_points(self):
-        hand = HandOfCards(cards)
-        self.assertEqual(hand.count_points(), 47)
+        # Call the function
+        raw_data = RawData()
+        result = raw_data.get_met('SN12345', 'temperature,precipitation', '2023-10-01/2023-10-02', 'PT1H')
 
-#Test that it correctly identifies the Queen of spades
-    def test_is_ladyspade_true(self):
-        hand = HandOfCards(cards)
-        self.assertTrue(hand.is_ladyspade())
+        # Assertions:   
+        self.assertIsInstance(result, pd.DataFrame)     # Is it a dataframe?
+        self.assertEqual(result.shape[0], 2)            # Is it the expected shape?
+        self.assertIn('referenceTime', result.columns)  # Did the function place the values in the right columns?
+    
+    # Thest that the function handles invalid inputs gracefully
+    @patch('requests.get')
+    def test_get_met_invalid_input(self, mock_get):
 
-#Test that it correctly identifies the lack of the Queen of spades
-    def test_is_ladyspade_false(self):
-        cards = [
-            PlayingCard("H", 10),  # 10 of Hearts
-            PlayingCard("D", 11),   # Jack of Diamonds
-            PlayingCard("D", 12),   # Queen of Spades
-            PlayingCard("C", 13),   # King of Clubs
-            PlayingCard("H", 1)    # Ace of Hearts
-            ]
-        hand = HandOfCards(cards)
-        self.assertFalse(hand.is_ladyspade()) 
+        # Creating a mock API response
+        mock_response = Mock()
+        mock_response.status_code = 400
+        mock_response.json.return_value = {
+            'error': {
+                'message': 'Invalid parameter: elements',
+                'reason': 'The requested elements are not valid.'
+            }     
+        }
+        mock_get.return_value = mock_response
 
-#Test that the string representation of the hand is ok
-    def test_str_representation(self):
-        hand = HandOfCards(cards)
-        self.assertEqual(str(hand), "H10, D11, S12, C13, H1")  # Check the string representation
+        # Call the function with invalid inputs
+        raw_data = RawData()
+        result = raw_data.get_met('SN12345', 'temperature,precipitation,pinkness', '2023-10-01/2023-10-02', 'PT1K')
 
-if __name__ == "__main__":
+        #Assertions: Does the function return "None" when given invalid inputs?
+        self.assertIsNone(result) 
+
+    # Check if the function handles an API error graciously
+    @patch('requests.get')
+    def test_get_met_api_error(self, mock_get):
+
+        # Create a mock API error response
+        mock_response = Mock()
+        mock_response.status_code = 404
+        mock_response.json.return_value = {
+            'error': {
+                'message': 'Not Found',
+                'reason': 'Resource not found'
+            }
+        }
+        mock_get.return_value = mock_response
+
+        # Call the function
+        raw_data = RawData()
+        result = raw_data.get_met('SN12345', 'temperature,precipitation', '2023-10-01/2023-10-02', 'PT1H')
+
+        # Assertions: Does the function return the expected "None" with an API error?
+        self.assertIsNone(result)
+
+    # Check if the function handles a connection error graciously
+    @patch('requests.get')
+    def test_get_met_connection_error(self, mock_get):
+
+        # Create a mock connection error
+        mock_get.side_effect = requests.exceptions.ConnectionError("Failed to connect")
+
+        # Call the function
+        raw_data = RawData()
+        result = raw_data.get_met('SN12345', 'temperature,precipitation', '2023-10-01/2023-10-02', 'PT1H')
+
+        # Assertions: Does the function return the expected "None" with a connection error?
+        self.assertIsNone(result)
+
+if __name__ == '__main__':
     unittest.main()
 
-
-
-
-
-
-    ****
-
-
-
-
-
-
-
-import unittest
-import sys, os
-
-# Add the parent directory of 'notebooks' to the sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from PlayingCard import PlayingCard
-
-
-class TestPlayingCard(unittest.TestCase):
-
-    #Test that a card is initialized correctly when given valid inputs
-    def test_valid_initialization(self):
-        card = PlayingCard("H", 10)  # 10 of Hearts
-        self.assertEqual(card.get_suit(), "H")
-        self.assertEqual(card.get_face(), 10)
-
-    #Test that an invalid suid creates an error
-    def test_invalid_suit_initialization(self):
-        with self.assertRaises(ValueError):
-            PlayingCard("X", 10)  # Invalid suit
-
-    #Test that an invalid number creates an error
-    def test_invalid_face_initialization(self):
-        with self.assertRaises(ValueError):
-            PlayingCard("H", 14)  # Invalid face
-
-    #Test that it strings correctly
-    def test_get_as_string(self):
-        card = PlayingCard("H", 10)  # 10 of Hearts
-        self.assertEqual(card.get_as_string(), "H10")
-
-    #Test that get_suit() returns the correc suit
-    def test_get_suit(self):
-        card = PlayingCard("D", 5)  # 5 of Diamonds
-        self.assertEqual(card.get_suit(), "D")
-
-    #Test that get_face() returns the correct value
-    def test_get_face(self):
-        card = PlayingCard("S", 12)  # Queen of Spades
-        self.assertEqual(card.get_face(), 12)
-
-    #Testing two identical cards are in fact equal
-    def test_equality(self):
-        card1 = PlayingCard("H", 10)  # 10 of Hearts
-        card2 = PlayingCard("H", 10)  # 10 of Hearts
-        card3 = PlayingCard("D", 10)  # 10 of Diamonds
-        self.assertEqual(card1, card2)  # Same suit and face
-        self.assertNotEqual(card1, card3)  # Different suit
-
-    #Testing the hash of a card
-    def test_hash(self):
-        card1 = PlayingCard("H", 10)  # 10 of Hearts
-        card2 = PlayingCard("H", 10)  # 10 of Hearts
-        card3 = PlayingCard("D", 10)  # 10 of Diamonds
-        self.assertEqual(hash(card1), hash(card2))  # Same suit and face
-        self.assertNotEqual(hash(card1), hash(card3))  # Different suit
-
-if __name__ == "__main__":
-    unittest.main()
