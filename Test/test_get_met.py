@@ -15,6 +15,10 @@ class TestRawData(unittest.TestCase):
     @patch('requests.get')
     def test_get_met_success(self, mock_get):
 
+        # The following codeblock was generated with the assistance of AI (reused for later code blocks)
+        # - Purpose: Creating a functioning mock API response
+        # - AI-tool: DeepSeek
+
         # Creating a mock API response
         mock_response = Mock()
         mock_response.status_code = 200
