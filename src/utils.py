@@ -1,5 +1,7 @@
 import pandas as pd
 
+
+
 # Importing the display-funtion for a jupyter file in a conditional manner
 try:
     from IPython.display import display, HTML
@@ -20,6 +22,12 @@ class VisualTable:
 
     # A function to make pandas show an entire dataframe in a readable manner
     def pretty_data(self, df):
+        """
+        This function was reworked with the assistance of AI:
+        - Purpose: To improve the readability of large DataFrames in Jupyter Notebooks 
+          by making the displayed tables scrollable
+        - AI Tool: DeepSeek
+        """
         pd.set_option('display.max_rows', None)
         pd.set_option('display.max_columns', None)
         pd.set_option('display.width', None)
