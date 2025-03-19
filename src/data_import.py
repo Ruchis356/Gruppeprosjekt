@@ -4,6 +4,7 @@
 
 import requests
 import pandas as pd
+import numpy as np
 
 #A class to import and handle environmental data (weather and air quality)
 class RawData:
