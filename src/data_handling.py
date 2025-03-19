@@ -7,7 +7,7 @@ class RefinedData:
     # ------------------------------------------
 
     # Check for missing data points and return a list
-    def missing_data(self, df, strategy, fill_value):
+    def missing_data(self, df, strategy='report', fill_value=None):
 
         # Adding 'strategy' and 'fill_value' as arguments was a suggestion from AI (DeepSeek)
         """
