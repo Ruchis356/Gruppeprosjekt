@@ -4,6 +4,7 @@
 
 import requests
 import pandas as pd
+import numpy as np
 
 #A class to import and handle environmental data (weather and air quality)
 class RawData:
@@ -184,6 +185,13 @@ class RawData:
             columns_coverage =  df.columns[df.columns.str.contains('Dekning', case=False)] # Making the column name less specific was a suggestion by AI (DeepSeek)
             for col in columns_coverage:
                 df.loc[df[col] < threshold, col] = 0
+
+            # Replace the air quality data with NaN where the coverage is too poor
+            for col in columns_coverage:
+                left_col_index = df.columns.get_loc(col) - 1
+                if left_col_index >= 0:     # Checking if the column exists was a suggestion by AI (DeepSeek)
+                    left_col = df.columns[left_col_index]
+                    df.loc[df[col] == 0, left_col] = np.nan
 
             # Print some basic information about the dataframe
             print('Data collected from nilu.com!')
