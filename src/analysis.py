@@ -30,5 +30,11 @@ print(df_weather.info())
 
 
 
+import pandas as pd
+name_list = df_weather['Elgeseter NO µg/m³ Day'].tolist()
+
+print(name_list)
+
+
 
 
