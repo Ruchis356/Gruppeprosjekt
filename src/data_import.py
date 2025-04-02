@@ -158,54 +158,45 @@ class RawData:
             pd.DataFrame: A DataFrame containing the air quality data.
         """
 
+        # The following block was optimised for lower resource use with the assistance of AI
+        # Purpose: reduce runtime and improve of the code
+        # AI tool: DeepSeek
+
         try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                df = pd.read_csv(
-                    file,
-                    skiprows=3,  
-                    sep=';',    
-                    on_bad_lines='skip'  
-                )
-
-            # Convert the 'Tid' column to a date-time format
-            df['Tid'] = pd.to_datetime(df['Tid'], format='%d.%m.%Y %H:%M')
-            time_column = 'Tid' 
-
-            # Replace empty values with NaN
-            df.replace('', pd.NA, inplace=True)      
-
-            # The following two blocks of code (for-statement and conversion to numerical values) were generated with assistance from AI
-            # - Purpose: How to best reformat the data to the correct number format
-            # - AI tool: DeepSeek
-
-            # Replacing any commas with periods, for the right number format
-            for col in df.columns.difference([time_column]):
-                df[col] = df[col].astype(str).str.replace(',', '.', regex=False).str.strip()
-
-            # Converting all collumns except for the 'Tid' column to numerical values
-            df[df.columns.difference([time_column])] = df[
-                df.columns.difference([time_column])
-            ].apply(pd.to_numeric, errors='coerce')            
-
+            # parsing csv file
+            df = pd.read_csv(
+                file_path,
+                skiprows=3,
+                sep=';',
+                on_bad_lines='skip',
+                encoding='utf-8',
+                parse_dates=['Tid'],
+                date_format='%d.%m.%Y %H:%M',
+                na_values='',  # Replace empty strings with NaN
+                decimal=',',   # Handle comma decimals correctly
+                dtype={col: 'float64' for col in pd.read_csv(file_path, nrows=1, skiprows=3, sep=';').columns 
+                    if col != 'Tid'}  # Pre-specify dtypes
+            )
+            
             # Replace the coverage(uptime) values that fall below the treshold with 0, to exclude the data from analysis
-            columns_coverage =  df.columns[df.columns.str.contains('Dekning', case=False)] # Making the column name less specific was a suggestion by AI (DeepSeek)
+            columns_coverage = df.columns[df.columns.str.contains('Dekning', case=False, regex=True)].tolist()
             for col in columns_coverage:
-                df.loc[df[col] < threshold, col] = 0
-
-            # Replace the air quality data with NaN where the coverage is too poor
-            for col in columns_coverage:
+                mask = df[col] < threshold
+                df.loc[mask, col] = 0
+                
+                # Replace the air quality data with NaN where the coverage is too poor
                 left_col_index = df.columns.get_loc(col) - 1
-                if left_col_index >= 0:     # Checking if the column exists was a suggestion by AI (DeepSeek)
+                if left_col_index >= 0:
                     left_col = df.columns[left_col_index]
-                    df.loc[df[col] == 0, left_col] = np.nan
-
-            # Print some basic information about the dataframe
+                    df.loc[mask, left_col] = np.nan
+            
+            # Print diagnostics
             print('Data collected from nilu.com!')
-            print('There are ', df.shape[0], 'lines of data in this dataframe.\n')
+            print(f'There are {df.shape[0]} lines of data in this dataframe.\n')
             self.df = df
-
-            #Returns dataframe upon request        
-            return(df)
+            
+            # Return the dataframe
+            return df
         
         # The following block was generated with the assistance of AI
         # Purpose: Including more specific errors; FileNotFound, ParserError
@@ -214,8 +205,11 @@ class RawData:
         # Return an error code if reading the csv file failed
         except FileNotFoundError:
             print(f"Error: The file '{file_path}' was not found. Check the file path.")
+            return None
         except pd.errors.ParserError:
             print("Error: Could not read the csv file. Check the formatting and encoding.")
+            return None
         except Exception as e:
             print(f"An unexpected error has occured: {e}")
+            return None
 
