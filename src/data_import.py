@@ -89,6 +89,8 @@ class RawData:
                 print('Message:', json_data['error']['message'])
                 print('Cause:', json_data['error']['reason'])
                 return None
+            
+            print('test 1')
 
             # Create and set up the dataframe
             data_list = []
@@ -97,6 +99,8 @@ class RawData:
                 row['referenceTime'] = obs['rederenceTime']
                 data_list.append(row)
             df = pd.DataFrame(data_list)
+
+            print('test2')
 
 #            df = pd.DataFrame()
 #            for obs in data:
