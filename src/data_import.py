@@ -89,25 +89,20 @@ class RawData:
                 print('Message:', json_data['error']['message'])
                 print('Cause:', json_data['error']['reason'])
                 return None
-            
-            print('test 1')
 
             # Create and set up the dataframe
             data_list = []
-            for obs in data():
-                row = obs['observations'].copy()
-                row['referenceTime'] = obs['rederenceTime']
-                data_list.append(row)
+            for obs in data:
+                if isinstance(obs['observations'], list):
+                    for observation in obs['observations']:
+                        row = observation.copy()
+                        row['referenceTime'] = obs['referenceTime']
+                        data_list.append(row)
+                else:
+                    row = obs['observations'].copy()
+                    row['referenceTime'] = obs['referenceTime']
+                    data_list.append(row)
             df = pd.DataFrame(data_list)
-
-            print('test2')
-
-#            df = pd.DataFrame()
-#            for obs in data:
-#                row = pd.DataFrame(obs['observations'])
-#                row['referenceTime'] = obs['referenceTime']
-#                df = pd.concat([df, row], ignore_index=True)
-
 
             # Remove uneeded collumns  
 
