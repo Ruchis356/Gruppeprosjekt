@@ -64,7 +64,9 @@ df_air = import_for_analysis('data/refined_air_qualty_data.csv')
 # Load weather data
 df_weather = import_for_analysis('data/refined_weather_data.csv')
 
-# Calculate and print results
+# Calculate and print results of the weekly averages
 print("Weekly averages for air quality data (from 'Elgeseter NO µg/m³ Day' column ):")
 if df_air is not None:
     print(calculate_avg_every_7th_row(df_air))
+
+
