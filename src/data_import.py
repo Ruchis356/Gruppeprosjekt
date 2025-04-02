@@ -91,11 +91,22 @@ class RawData:
                 return None
 
             # Create and set up the dataframe
-            df = pd.DataFrame()
+            data_list = []
+            for row in data():
+                data_list.append(row)
+            df = pd.DataFrame(data_list)
+
+
+
+
+
+
+
+            '''            df = pd.DataFrame()
             for obs in data:
                 row = pd.DataFrame(obs['observations'])
                 row['referenceTime'] = obs['referenceTime']
-                df = pd.concat([df, row], ignore_index=True) 
+                df = pd.concat([df, row], ignore_index=True) '''
 
 
             # Remove uneeded collumns  
