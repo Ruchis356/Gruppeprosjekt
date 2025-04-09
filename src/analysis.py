@@ -28,13 +28,7 @@ df_weather = import_for_analysis(file_path)
 print(df_air.info())
 print(df_weather.info())
 
-<<<<<<< Updated upstream
-=======
 
-
-
-
->>>>>>> Stashed changes
 import pandas as pd
 
 # Function to read CSV file
