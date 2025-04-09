@@ -68,10 +68,13 @@ class RawData:
             # Define endpoints and parameters
             endpoint = 'https://frost.met.no/observations/v0.jsonld'
             parameters = {
-                'sources': weather_station,  # Station ID for Voll weather station
-                'elements': weather_elements,  # Requestion various types of eather data
+                'sources': weather_station,  # Station ID 
+                'elements': weather_elements,  # Requestion various types of weather data
                 'referencetime': weather_time,  # Limiting the time frame for the data request
                 'timeresolutions': weather_resolution,  # Set the resolution(granularity) of the data
+                'levels': 'default',
+                'timeoffsets': 'default', # Selects the best timeiffset value available, first PT6H then PT0H
+                'qualities': '0,1,2,3,4' # Only import data of a high enough quailty as explained here: https://frost.met.no/dataclarifications.html#quality-code
             }
 
             # Send an HTTP GET-request
@@ -105,9 +108,6 @@ class RawData:
             df = pd.DataFrame(data_list)
 
             # Remove uneeded collumns  
-
-            '''add timeoffset if we decide not to use it: , "timeOffset"'''
-
             columns_to_drop = ["level", "timeResolution", "timeSeriesId", "elementId", "performanceCategory", "exposureCategory", "qualityCode"]
             df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
 
@@ -116,6 +116,29 @@ class RawData:
 
             print('There are ', df.shape[0]-1, 'lines of data in this dataframe.\n')
             self.df = df
+
+            # The following block (if) was generated with the assistance of AI
+            # Purpose: AI generated the df.drop_duplicates line and suggested how to use df.pivot
+            # AI tool: DeepSeek            
+
+            if not df.empty:
+                # Check rows for duplicate/multiple values and only keeping one
+                df = df.drop_duplicates(subset=['referenceTime', 'unit'], keep='first')
+                
+                # Pivot to wide format
+                pivoted_df = df.pivot(
+                    index='referenceTime',
+                    columns='unit',
+                    values='value'
+                ).reset_index()
+                
+                # Clean up column names
+                pivoted_df.columns.name = None
+                df = pivoted_df.rename(columns={
+                    'degC': 'temperature',
+                    'mm': 'precipitation',
+                    'm/s': 'wind_speed'
+                })
 
             #Returns dataframe upon request
             return(df)
@@ -159,7 +182,7 @@ class RawData:
         """
 
         # The following block was optimised for lower resource use with the assistance of AI
-        # Purpose: reduce runtime and improve of the code
+        # Purpose: reduce runtime and improve of the code when reading the csv file
         # AI tool: DeepSeek
 
         try:
@@ -178,18 +201,30 @@ class RawData:
                     if col != 'Tid'}  # Pre-specify dtypes
             )
             
-            # Replace the coverage(uptime) values that fall below the treshold with 0, to exclude the data from analysis
-            columns_coverage = df.columns[df.columns.str.contains('Dekning', case=False, regex=True)].tolist()
-            for col in columns_coverage:
-                mask = df[col] < threshold
-                df.loc[mask, col] = 0
-                
-                # Replace the air quality data with NaN where the coverage is too poor
-                left_col_index = df.columns.get_loc(col) - 1
-                if left_col_index >= 0:
-                    left_col = df.columns[left_col_index]
-                    df.loc[mask, left_col] = np.nan
+            # The following two blocks are an improvement made based on a suggestion from AI
+            # Purpose: Entirely replace a function in 'data_handling' that dealt with coverage by utilising and removing the overage columns within this function
+            # AI tool: DeepSeek
             
+            # Process coverage columns
+            coverage_cols = df.columns[df.columns.str.contains('Dekning', case=False)].tolist()            
+            for cov_col in coverage_cols:
+                meas_col = df.columns[df.columns.get_loc(cov_col) - 1] # Get corresponding measurement column
+                df.loc[df[cov_col] < threshold, meas_col] = np.nan # Set measurements to NaN where coverage is below threshold
+            df = df.drop(columns=coverage_cols) # Remove all coverage columns after processing
+            
+            # Simplify remaining column names
+            new_cols = {'Tid': 'timestamp'}
+            for col in df.columns:
+                if col != 'Tid':
+                    # Extract pollutant type (NO, NO2, etc.) and unit to create new column names
+                    parts = col.split()
+                    pollutant = parts[1] 
+                    unit = parts[2]     
+                    new_cols[col] = f"{pollutant}_{unit.replace('/', '')}"
+            
+            df = df.rename(columns=new_cols)
+
+
             # Print diagnostics
             print('Data collected from nilu.com!')
             print(f'There are {df.shape[0]} lines of data in this dataframe.\n')
