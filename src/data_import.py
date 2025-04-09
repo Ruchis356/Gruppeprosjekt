@@ -135,9 +135,10 @@ class RawData:
                 # Clean up column names
                 pivoted_df.columns.name = None
                 df = pivoted_df.rename(columns={
-                    'degC': 'temperature',
-                    'mm': 'precipitation',
-                    'm/s': 'wind_speed'
+                    'degC': 'temperature (C)',
+                    'mm': 'precipitation (mm)',
+                    'm/s': 'wind_speed (m/s)',
+                    'referenceTime': 'Date'
                 })
 
             #Returns dataframe upon request
@@ -213,17 +214,13 @@ class RawData:
             df = df.drop(columns=coverage_cols) # Remove all coverage columns after processing
             
             # Simplify remaining column names
-            new_cols = {'Tid': 'timestamp'}
+            new_cols = {'Tid': 'Date'}
             for col in df.columns:
                 if col != 'Tid':
-                    # Extract pollutant type (NO, NO2, etc.) and unit to create new column names
-                    parts = col.split()
-                    pollutant = parts[1] 
-                    unit = parts[2]     
-                    new_cols[col] = f"{pollutant}_{unit.replace('/', '')}"
-            
+                    # Extract pollutant type (NO, NO2, etc.) to create new column names
+                    pollutant = col.split()[1] 
+                    new_cols[col] = pollutant 
             df = df.rename(columns=new_cols)
-
 
             # Print diagnostics
             print('Data collected from nilu.com!')
