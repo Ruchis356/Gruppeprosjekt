@@ -68,10 +68,13 @@ class RawData:
             # Define endpoints and parameters
             endpoint = 'https://frost.met.no/observations/v0.jsonld'
             parameters = {
-                'sources': weather_station,  # Station ID for Voll weather station
-                'elements': weather_elements,  # Requestion various types of eather data
+                'sources': weather_station,  # Station ID 
+                'elements': weather_elements,  # Requestion various types of weather data
                 'referencetime': weather_time,  # Limiting the time frame for the data request
                 'timeresolutions': weather_resolution,  # Set the resolution(granularity) of the data
+                'levels': 'default',
+                'timeoffsets': 'default', # Selects the best timeiffset value available, first PT6H then PT0H
+                'qualities': '0,1,2,3,4' # Only import data of a high enough quailty as explained here: https://frost.met.no/dataclarifications.html#quality-code
             }
 
             # Send an HTTP GET-request
@@ -91,17 +94,20 @@ class RawData:
                 return None
 
             # Create and set up the dataframe
-            df = pd.DataFrame()
+            data_list = []
             for obs in data:
-                row = pd.DataFrame(obs['observations'])
-                row['referenceTime'] = obs['referenceTime']
-                df = pd.concat([df, row], ignore_index=True) 
-
+                if isinstance(obs['observations'], list):
+                    for observation in obs['observations']:
+                        row = observation.copy()
+                        row['referenceTime'] = obs['referenceTime']
+                        data_list.append(row)
+                else:
+                    row = obs['observations'].copy()
+                    row['referenceTime'] = obs['referenceTime']
+                    data_list.append(row)
+            df = pd.DataFrame(data_list)
 
             # Remove uneeded collumns  
-
-            '''add timeoffset if we decide not to use it: , "timeOffset"'''
-
             columns_to_drop = ["level", "timeResolution", "timeSeriesId", "elementId", "performanceCategory", "exposureCategory", "qualityCode"]
             df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
 
@@ -110,6 +116,30 @@ class RawData:
 
             print('There are ', df.shape[0]-1, 'lines of data in this dataframe.\n')
             self.df = df
+
+            # The following block (if) was generated with the assistance of AI
+            # Purpose: AI generated the df.drop_duplicates line and suggested how to use df.pivot
+            # AI tool: DeepSeek            
+
+            if not df.empty:
+                # Check rows for duplicate/multiple values and only keeping one
+                df = df.drop_duplicates(subset=['referenceTime', 'unit'], keep='first')
+                
+                # Pivot to wide format
+                pivoted_df = df.pivot(
+                    index='referenceTime',
+                    columns='unit',
+                    values='value'
+                ).reset_index()
+                
+                # Clean up column names
+                pivoted_df.columns.name = None
+                df = pivoted_df.rename(columns={
+                    'degC': 'temperature (C)',
+                    'mm': 'precipitation (mm)',
+                    'm/s': 'wind_speed (m/s)',
+                    'referenceTime': 'Date'
+                })
 
             #Returns dataframe upon request
             return(df)
@@ -152,54 +182,53 @@ class RawData:
             pd.DataFrame: A DataFrame containing the air quality data.
         """
 
+        # The following block was optimised for lower resource use with the assistance of AI
+        # Purpose: reduce runtime and improve of the code when reading the csv file
+        # AI tool: DeepSeek
+
         try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                df = pd.read_csv(
-                    file,
-                    skiprows=3,  
-                    sep=';',    
-                    on_bad_lines='skip'  
-                )
+            # parsing csv file
+            df = pd.read_csv(
+                file_path,
+                skiprows=3,
+                sep=';',
+                on_bad_lines='skip',
+                encoding='utf-8',
+                parse_dates=['Tid'],
+                date_format='%d.%m.%Y %H:%M',
+                na_values='',  # Replace empty strings with NaN
+                decimal=',',   # Handle comma decimals correctly
+                dtype={col: 'float64' for col in pd.read_csv(file_path, nrows=1, skiprows=3, sep=';').columns 
+                    if col != 'Tid'}  # Pre-specify dtypes
+            )
+            
+            # The following two blocks are an improvement made based on a suggestion from AI
+            # Purpose: Entirely replace a function in 'data_handling' that dealt with coverage by utilising and removing the overage columns within this function
+            # AI tool: DeepSeek
+            
+            # Process coverage columns
+            coverage_cols = df.columns[df.columns.str.contains('Dekning', case=False)].tolist()            
+            for cov_col in coverage_cols:
+                meas_col = df.columns[df.columns.get_loc(cov_col) - 1] # Get corresponding measurement column
+                df.loc[df[cov_col] < threshold, meas_col] = np.nan # Set measurements to NaN where coverage is below threshold
+            df = df.drop(columns=coverage_cols) # Remove all coverage columns after processing
+            
+            # Simplify remaining column names
+            new_cols = {'Tid': 'Date'}
+            for col in df.columns:
+                if col != 'Tid':
+                    # Extract pollutant type (NO, NO2, etc.) to create new column names
+                    pollutant = col.split()[1] 
+                    new_cols[col] = pollutant 
+            df = df.rename(columns=new_cols)
 
-            # Convert the 'Tid' column to a date-time format
-            df['Tid'] = pd.to_datetime(df['Tid'], format='%d.%m.%Y %H:%M')
-            time_column = 'Tid' 
-
-            # Replace empty values with NaN
-            df.replace('', pd.NA, inplace=True)      
-
-            # The following two blocks of code (for-statement and conversion to numerical values) were generated with assistance from AI
-            # - Purpose: How to best reformat the data to the correct number format
-            # - AI tool: DeepSeek
-
-            # Replacing any commas with periods, for the right number format
-            for col in df.columns.difference([time_column]):
-                df[col] = df[col].astype(str).str.replace(',', '.', regex=False).str.strip()
-
-            # Converting all collumns except for the 'Tid' column to numerical values
-            df[df.columns.difference([time_column])] = df[
-                df.columns.difference([time_column])
-            ].apply(pd.to_numeric, errors='coerce')            
-
-            # Replace the coverage(uptime) values that fall below the treshold with 0, to exclude the data from analysis
-            columns_coverage =  df.columns[df.columns.str.contains('Dekning', case=False)] # Making the column name less specific was a suggestion by AI (DeepSeek)
-            for col in columns_coverage:
-                df.loc[df[col] < threshold, col] = 0
-
-            # Replace the air quality data with NaN where the coverage is too poor
-            for col in columns_coverage:
-                left_col_index = df.columns.get_loc(col) - 1
-                if left_col_index >= 0:     # Checking if the column exists was a suggestion by AI (DeepSeek)
-                    left_col = df.columns[left_col_index]
-                    df.loc[df[col] == 0, left_col] = np.nan
-
-            # Print some basic information about the dataframe
+            # Print diagnostics
             print('Data collected from nilu.com!')
-            print('There are ', df.shape[0], 'lines of data in this dataframe.\n')
+            print(f'There are {df.shape[0]} lines of data in this dataframe.\n')
             self.df = df
-
-            #Returns dataframe upon request        
-            return(df)
+            
+            # Return the dataframe
+            return df
         
         # The following block was generated with the assistance of AI
         # Purpose: Including more specific errors; FileNotFound, ParserError
@@ -208,8 +237,11 @@ class RawData:
         # Return an error code if reading the csv file failed
         except FileNotFoundError:
             print(f"Error: The file '{file_path}' was not found. Check the file path.")
+            return None
         except pd.errors.ParserError:
             print("Error: Could not read the csv file. Check the formatting and encoding.")
+            return None
         except Exception as e:
             print(f"An unexpected error has occured: {e}")
+            return None
 
