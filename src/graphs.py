@@ -68,6 +68,138 @@ if df_weather is not None:
 
 
 
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Importere data
+file_path_air = 'data/refined_air_qualty_data.csv'
+file_path_weather = 'data/refined_weather_data.csv'
+
+def import_for_analysis(file_path):
+    try:
+        df = pd.read_csv(file_path, sep=',', encoding='utf-8')
+        return df
+    except FileNotFoundError:
+        print(f"Error: Filen '{file_path}' ble ikke funnet.")
+        return None
+
+df_air = import_for_analysis(file_path_air)
+df_weather = import_for_analysis(file_path_weather)
+
+# Konvertere dato-kolonner til datetime
+if df_air is not None:
+    df_air['Date'] = pd.to_datetime(df_air['Date'])
+
+if df_weather is not None:
+    df_weather['Date'] = pd.to_datetime(df_weather['Date'])
+
+# ----------- 1. GRAF: NO, NO2, NOx med Temperatur -------------
+if df_air is not None and df_weather is not None:
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+
+    # Venstre y-akse for drivhusgasser (NO, NO2, NOx)
+    ax1.plot(df_air['Date'], df_air['NO'], label='NO', color='blue', lw=2)
+    ax1.plot(df_air['Date'], df_air['NO2'], label='NO2', color='green', lw=2)
+    ax1.plot(df_air['Date'], df_air['NOx'], label='NOx', color='red', lw=2)
+
+    ax1.set_xlabel('Dato')
+    ax1.set_ylabel('Luftforurensning (µg/m³)', color='black')
+    ax1.tick_params(axis='y', labelcolor='black')
+
+    ax1.legend(loc='upper left')
+
+    # Sekundær y-akse for temperatur
+    ax2 = ax1.twinx()
+    ax2.plot(df_weather['Date'], df_weather['temperature (C)'], label='Temperatur (°C)', color='blue', lw=2)
+    
+    # Sett y-lim for temperatur
+    ax2.set_ylim(-30, 40)  # Juster etter behov
+
+    ax2.set_ylabel('Temperatur (°C)', color='blue')
+    ax2.tick_params(axis='y', labelcolor='blue')
+
+    ax2.legend(loc='upper right')
+
+    plt.title('Luftforurensning (NO, NO2, NOx) og Temperatur')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+# ----------- 2. GRAF: PM10, PM2.5 med Vindhastighet -------------
+if df_air is not None and df_weather is not None:
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+
+    # Venstre y-akse for drivhusgasser (PM10, PM2.5)
+    ax1.plot(df_air['Date'], df_air['PM10'], label='PM10', color='purple', lw=2)
+    ax1.plot(df_air['Date'], df_air['PM2.5'], label='PM2.5', color='orange', lw=2)
+
+    ax1.set_xlabel('Dato')
+    ax1.set_ylabel('Luftforurensning (µg/m³)', color='black')
+    ax1.tick_params(axis='y', labelcolor='black')
+
+    ax1.legend(loc='upper left')
+
+    # Sekundær y-akse for vindhastighet
+    ax2 = ax1.twinx()
+    ax2.plot(df_weather['Date'], df_weather['wind_speed (m/s)'], label='Vindhastighet (m/s)', color='green', lw=2)
+    
+    # Sett y-lim for vindhastighet
+    ax2.set_ylim(0, 10)  # Juster etter behov
+
+    ax2.set_ylabel('Vindhastighet (m/s)', color='green')
+    ax2.tick_params(axis='y', labelcolor='green')
+
+    ax2.legend(loc='upper right')
+
+    plt.title('Luftforurensning (PM10, PM2.5) og Vindhastighet')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+# ----------- 3. GRAF: Alle drivhusgasser med Nedbør -------------
+if df_air is not None and df_weather is not None:
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+
+    # Venstre y-akse for alle drivhusgasser
+    ax1.plot(df_air['Date'], df_air['NO'], label='NO', color='blue', lw=2)
+    ax1.plot(df_air['Date'], df_air['NO2'], label='NO2', color='green', lw=2)
+    ax1.plot(df_air['Date'], df_air['NOx'], label='NOx', color='red', lw=2)
+    ax1.plot(df_air['Date'], df_air['PM10'], label='PM10', color='purple', lw=2)
+    ax1.plot(df_air['Date'], df_air['PM2.5'], label='PM2.5', color='orange', lw=2)
+
+    ax1.set_xlabel('Dato')
+    ax1.set_ylabel('Luftforurensning (µg/m³)', color='black')
+    ax1.tick_params(axis='y', labelcolor='black')
+
+    ax1.legend(loc='upper left')
+
+    # Sekundær y-akse for nedbør
+    ax2 = ax1.twinx()
+    ax2.plot(df_weather['Date'], df_weather['precipitation (mm)'], label='Nedbør (mm)', color='red', lw=2)
+
+    # Sett y-lim for nedbør
+    ax2.set_ylim(0, 100)  # Juster etter behov
+
+    ax2.set_ylabel('Nedbør (mm)', color='red')
+    ax2.tick_params(axis='y', labelcolor='red')
+
+    ax2.legend(loc='upper right')
+
+    plt.title('Alle drivhusgasser og Nedbør')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+
+
+
+
+
+
+
 
 
 
