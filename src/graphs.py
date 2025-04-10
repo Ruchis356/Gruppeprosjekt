@@ -98,9 +98,11 @@ if df_air is not None and df_weather is not None:
     fig, ax1 = plt.subplots(figsize=(12, 6))
 
     # Venstre y-akse for drivhusgasser (NO, NO2, NOx)
-    ax1.plot(df_air['Date'], df_air['NO'], label='NO', color='blue', lw=2)
+    ax1.plot(df_air['Date'], df_air['NO'], label='NO', color='purple', lw=2)
     ax1.plot(df_air['Date'], df_air['NO2'], label='NO2', color='green', lw=2)
     ax1.plot(df_air['Date'], df_air['NOx'], label='NOx', color='red', lw=2)
+    ax1.plot(df_air['Date'], df_air['PM2.5'], label='PM2.5', color='yellow', lw=2)
+    ax1.plot(df_air['Date'], df_air['PM10'], label='PM10', color='orange', lw=2)
 
     ax1.set_xlabel('Dato')
     ax1.set_ylabel('Luftforurensning (µg/m³)', color='black')
@@ -132,6 +134,9 @@ if df_air is not None and df_weather is not None:
     # Venstre y-akse for drivhusgasser (PM10, PM2.5)
     ax1.plot(df_air['Date'], df_air['PM10'], label='PM10', color='purple', lw=2)
     ax1.plot(df_air['Date'], df_air['PM2.5'], label='PM2.5', color='orange', lw=2)
+    ax1.plot(df_air['Date'], df_air['NO'], label='NO', color='blue', lw=2)
+    ax1.plot(df_air['Date'], df_air['NOx'], label='NOx', color='yellow', lw=2)
+    ax1.plot(df_air['Date'], df_air['NO2'], label='NO2', color='red', lw=2)
 
     ax1.set_xlabel('Dato')
     ax1.set_ylabel('Luftforurensning (µg/m³)', color='black')
@@ -175,12 +180,12 @@ if df_air is not None and df_weather is not None:
 
     # Sekundær y-akse for nedbør
     ax2 = ax1.twinx()
-    ax2.plot(df_weather['Date'], df_weather['precipitation (mm)'], label='Nedbør (mm)', color='red', lw=2)
+    ax2.plot(df_weather['Date'], df_weather['precipitation (mm)'], label='Nedbør (mm)', color='black', lw=2)
 
     # Sett y-lim for nedbør
     ax2.set_ylim(0, 100)  # Juster etter behov
 
-    ax2.set_ylabel('Nedbør (mm)', color='red')
+    ax2.set_ylabel('Nedbør (mm)', color='black')
     ax2.tick_params(axis='y', labelcolor='red')
 
     ax2.legend(loc='upper right')
