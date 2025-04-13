@@ -32,7 +32,7 @@ if df_air is not None:
 if df_weather is not None:
     df_weather['Date'] = pd.to_datetime(df_weather['Date'])
 
-# ----------- LUFTFORURENSNING SOM PUNKTER -------------
+# Graf 1:----------- LUFTFORURENSNING SOM PUNKTER -------------
 if df_air is not None:
     plt.figure(figsize=(12, 6))
     sns.scatterplot(data=df_air, x='Date', y='NO', label='NO')
@@ -48,7 +48,7 @@ if df_air is not None:
     plt.tight_layout()
     plt.show()
 
-# ----------- VÆRDATA SOM PUNKTER -------------
+# Graf 2:----------- VÆRDATA SOM PUNKTER -------------
 if df_weather is not None:
     plt.figure(figsize=(12, 6))
     if 'temperature (C)' in df_weather.columns:
@@ -93,7 +93,7 @@ if df_air is not None:
 if df_weather is not None:
     df_weather['Date'] = pd.to_datetime(df_weather['Date'])
 
-# ----------- 1. GRAF: NO, NO2, NOx med Temperatur -------------
+# ----------- Graf 3:: NO, NO2, NOx, PM2.5 og PM10 med Temperatur -------------
 if df_air is not None and df_weather is not None:
     fig, ax1 = plt.subplots(figsize=(12, 6))
 
@@ -115,19 +115,19 @@ if df_air is not None and df_weather is not None:
     ax2.plot(df_weather['Date'], df_weather['temperature (C)'], label='Temperatur (°C)', color='blue', lw=2)
     
     # Sett y-lim for temperatur
-    ax2.set_ylim(-30, 40)  # Juster etter behov
+    ax2.set_ylim(-30, 40)  
 
     ax2.set_ylabel('Temperatur (°C)', color='blue')
     ax2.tick_params(axis='y', labelcolor='blue')
 
     ax2.legend(loc='upper right')
 
-    plt.title('Luftforurensning (NO, NO2, NOx) og Temperatur')
+    plt.title('Luftforurensning (NO, NO2, NOx,PM2.5,PM10) og Temperatur')
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
 
-# ----------- 2. GRAF: PM10, PM2.5 med Vindhastighet -------------
+# -----------  GRAF 4: PM10, PM2.5, NO, NOx, NO2 med Vindhastighet -------------
 if df_air is not None and df_weather is not None:
     fig, ax1 = plt.subplots(figsize=(12, 6))
 
@@ -149,7 +149,7 @@ if df_air is not None and df_weather is not None:
     ax2.plot(df_weather['Date'], df_weather['wind_speed (m/s)'], label='Vindhastighet (m/s)', color='green', lw=2)
     
     # Sett y-lim for vindhastighet
-    ax2.set_ylim(0, 10)  # Juster etter behov
+    ax2.set_ylim(0, 10)  
 
     ax2.set_ylabel('Vindhastighet (m/s)', color='green')
     ax2.tick_params(axis='y', labelcolor='green')
@@ -161,7 +161,7 @@ if df_air is not None and df_weather is not None:
     plt.tight_layout()
     plt.show()
 
-# ----------- 3. GRAF: Alle drivhusgasser med Nedbør -------------
+# ----------- GRAF 5 NO, NO2, NOx, PM2.5,PM10 med Nedbør -------------
 if df_air is not None and df_weather is not None:
     fig, ax1 = plt.subplots(figsize=(12, 6))
 
@@ -183,7 +183,7 @@ if df_air is not None and df_weather is not None:
     ax2.plot(df_weather['Date'], df_weather['precipitation (mm)'], label='Nedbør (mm)', color='black', lw=2)
 
     # Sett y-lim for nedbør
-    ax2.set_ylim(0, 100)  # Juster etter behov
+    ax2.set_ylim(0, 100)  
 
     ax2.set_ylabel('Nedbør (mm)', color='black')
     ax2.tick_params(axis='y', labelcolor='red')
@@ -194,12 +194,6 @@ if df_air is not None and df_weather is not None:
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
-
-
-
-
-
-
 
 
 
