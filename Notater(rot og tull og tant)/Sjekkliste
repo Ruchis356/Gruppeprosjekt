@@ -39,6 +39,26 @@ Hente og bruke historisk data om vær og luftkvalitet til å forutsi hvordan luf
 - Minimalt med 'sjekk av data' some å printe hele datasettet
 
 
+
+**Updates to AI information**
+
+## Consistency in Formatting:
+- Ensure that all AI contributions in the code are annotated consistently.
+- Consider using a consistent prefix for AI-related comments, such as # AI-Assisted: or # AI-Generated:.
+- For some entries, it’s unclear whether the AI generated the code entirely or only suggested improvements.
+- Consider adding a brief note about the extent of human involvement (e.g., "AI-generated, lightly edited" or "AI-suggested, fully implemented by the developer").
+- While it’s important to disclose AI use, it’s equally important to highlight where human judgment and creativity were applied. For example: You could add a note about why you chose to implement this suggestion and how it improved the code.
+- Consider adding a section in the "Detailed Use of AI" document that acknowledges the limitations of the AI tool. 
+- Add a summary at the end of the "Detailed Use of AI" document:
+
+## Summary of AI Contributions:
+- AI was used to generate boilerplate code, suggest improvements to error handling, and assist with data formatting.
+- All AI-generated code was reviewed, tested, and modified as necessary by the developer to ensure correctness and alignment with project requirements.
+- AI was particularly helpful in identifying edge cases (e.g., invalid inputs, API errors) and suggesting ways to handle them.
+- The use of AI accelerated development but did not replace human judgment, as all decisions about code implementation were made by the developer.
+
+
+
 **Vurderingskriterier**
 
 ## Krav:
@@ -172,3 +192,7 @@ Uke 15: Testing og dokumentasjon
 Kilder vi bruker:
 https://seklima.met.no/stations/
 https://www.met.no/frie-meteorologiske-data/frie-meteorologiske-data
+
+client ID: f0cfe822-6d2c-4d3c-80f8-cbf38b0c15a9
+client secret: client_id = b8950f6f-769e-4fd6-b658-0be1b21fbff8
+
