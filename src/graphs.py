@@ -123,6 +123,7 @@ if df_air is not None and df_weather is not None:
     ax2.legend(loc='upper right')
 
     plt.title('Luftforurensning (NO, NO2, NOx,PM2.5,PM10) og Temperatur')
+
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
@@ -194,13 +195,3 @@ if df_air is not None and df_weather is not None:
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
-
-
-
-
-
-
-
-
-
-
