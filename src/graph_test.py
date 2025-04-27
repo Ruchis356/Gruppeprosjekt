@@ -39,7 +39,7 @@ class InteractiveGraphs:
                 )
             )
         
-        # Create simple toggle buttons (no JavaScript for now)
+        # Create simple toggle button
         buttons = [
             dict(
                 label='✓ All',
@@ -106,10 +106,11 @@ class InteractiveGraphs:
 
 
     def comparative_graph(self, df, columns, df_predictor, predictor, title, x_axis, y_axis, y_lims=None, zero_align=False):
-        """Create interactive comparison plot with weather variable buttons"""
+        """Create interactive comparison plot with proper toggle behavior"""
         fig = make_subplots(specs=[[{"secondary_y": True}]])
         
-        # Add pollution traces (primary y-axis)
+        # Add pollution traces (all visible initially)
+        self.pol_visible = [True] * len(columns)
         for i, col in enumerate(columns):
             fig.add_trace(
                 go.Scatter(
@@ -118,21 +119,26 @@ class InteractiveGraphs:
                     name=col,
                     mode='lines+markers',
                     marker=dict(size=4, color=self.colors[i % len(self.colors)]),
-                    line=dict(width=1)
+                    line=dict(width=1),
+                    visible=True,
+                    legendgroup='pollutants'
                 ),
-                secondary_y=False  # Correct placement of secondary_y parameter
+                secondary_y=False
             )
         
-        # Add weather trace (secondary y-axis)
+        # Add weather trace (visible initially)
+        self.weather_visible = True
         fig.add_trace(
             go.Scatter(
                 x=df_predictor['Date'],
                 y=df_predictor[predictor],
                 name=predictor,
                 mode='lines',
-                line=dict(dash='dot', color='#666666', width=2)
+                line=dict(dash='dot', color='#666666', width=2),
+                visible=True,
+                legendgroup='weather'
             ),
-            secondary_y=True  # Correct placement of secondary_y parameter
+            secondary_y=True
         )
         
         # Create weather variable buttons
@@ -141,8 +147,9 @@ class InteractiveGraphs:
                 method='update',
                 label=var,
                 args=[
-                    {'y': [df_predictor[var]]},  # Update weather data
-                    {'yaxis2.title': var}        # Update axis label
+                    {'y': [df_predictor[var]], 'name': [var]},  # Update weather data
+                    {'yaxis2.title': var},                      # Update axis label
+                    {'visible': self.pol_visible + [True]}      # Keep current pollutant visibility
                 ]
             ) for var in self.weather_vars
         ]
@@ -150,28 +157,45 @@ class InteractiveGraphs:
         # Create pollutant toggle buttons
         toggle_buttons = [
             dict(
-                label='✓ All',
+                label='✓ All Pollutants',
                 method='update',
-                args=[{'visible': [True]*(len(columns)+1)}]  # +1 for weather trace
+                args=[{'visible': [True]*len(columns) + [self.weather_visible]}],
+                args2=[{'title': 'Showing all pollutants'}]
             ),
             dict(
-                label='✗ None',
+                label='✗ No Pollutants',
                 method='update',
-                args=[{'visible': [False]*(len(columns)+1)}]
+                args=[{'visible': [False]*len(columns) + [self.weather_visible]}],
+                args2=[{'title': 'Hiding all pollutants'}]
             )
         ]
-        toggle_buttons += [
-            dict(
-                label=f'● {col}',
-                method='restyle',
-                args=[{'visible': [col == trace.name for trace in fig.data]}]
-            ) for col in columns
-        ]
+        
+        # Add individual pollutant toggles
+        for i, col in enumerate(columns):
+            toggle_buttons.append(
+                dict(
+                    label=f'● {col}',
+                    method='restyle',
+                    args=[{
+                        'visible': [
+                            True if j == i else vis 
+                            for j, vis in enumerate(self.pol_visible)
+                        ] + [self.weather_visible]
+                    }],
+                    args2=[{
+                        'visible': [
+                            not self.pol_visible[j] if j == i else vis 
+                            for j, vis in enumerate(self.pol_visible)
+                        ] + [self.weather_visible]
+                    }]
+                )
+            )
         
         fig.update_layout(
             title=title,
             xaxis_title=x_axis,
             yaxis_title=y_axis,
+            yaxis2_title=predictor,
             template=self.template,
             hovermode="x unified",
             updatemenus=[
