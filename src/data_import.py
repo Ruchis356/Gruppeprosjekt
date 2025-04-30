@@ -18,16 +18,16 @@ class RawData:
     # ------------------------------------------
 
     #Fetch weather data from the Frost API 
-    def get_met(self, weather_station, weather_elements, weather_time, weather_resolution):
+    def get_met(self, station_id, elements, time_range, resolution):
 
         """
         Fetch weather data from the Frost API.
 
         Args:
-            weather_station (str): The ID of the weather station.
-            weather_elements (str): The measurements to include.
-            weather_time (str): The time range for the data.
-            weather_resolution (str): The granularity of the data.
+            station_id (str): The ID of the weather station.
+            elements (str): The measurements to include.
+            time_range (str): The time range for the data.
+            resolution (str): The granularity of the data.
 
         Returns:
             pd.DataFrame: A DataFrame containing the weather data.
@@ -41,20 +41,20 @@ class RawData:
             # - AI tool: DeepSeek
 
             # Validate the arguments given to the function
-            if not weather_station or not weather_elements or not weather_time or not weather_resolution:
+            if not station_id or not elements or not time_range or not resolution:
                 raise ValueError("All input parameters must be provided.")
 
-            if not isinstance(weather_station, str):
-                raise ValueError("weather_station must be a string.")
+            if not isinstance(station_id, str):
+                raise ValueError("station_id must be a string.")
 
-            if not isinstance(weather_elements, str):
-                raise ValueError("weather_elements must be a string.")
+            if not isinstance(elements, str):
+                raise ValueError("elements must be a string.")
 
-            if not isinstance(weather_time, str):
-                raise ValueError("weather_time must be a string.")
+            if not isinstance(time_range, str):
+                raise ValueError("time_range must be a string.")
 
-            if not isinstance(weather_resolution, str):
-                raise ValueError("weather_resolution must be a string.")
+            if not isinstance(resolution, str):
+                raise ValueError("resolution must be a string.")
 
             # If the arguments are valid, proceed with the API request
 
@@ -68,10 +68,10 @@ class RawData:
             # Define endpoints and parameters
             endpoint = 'https://frost.met.no/observations/v0.jsonld'
             parameters = {
-                'sources': weather_station,  # Station ID 
-                'elements': weather_elements,  # Requestion various types of weather data
-                'referencetime': weather_time,  # Limiting the time frame for the data request
-                'timeresolutions': weather_resolution,  # Set the resolution(granularity) of the data
+                'sources': station_id,  # Station ID 
+                'elements': elements,  # Requestion various types of weather data
+                'referencetime': time_range,  # Limiting the time frame for the data request
+                'timeresolutions': resolution,  # Set the resolution(granularity) of the data
                 'levels': 'default',
                 'timeoffsets': 'default', # Selects the best timeiffset value available, first PT6H then PT0H
                 'qualities': '0,1,2,3,4' # Only import data of a high enough quailty as explained here: https://frost.met.no/dataclarifications.html#quality-code

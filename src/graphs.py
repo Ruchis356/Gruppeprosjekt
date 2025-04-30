@@ -1,200 +1,175 @@
-# Class Graphs
-
-
-import sys, os
-import pandas as pd
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), '..', 'src'))) # This construct was reworked with the assistance of AI (DeepSeek) 
-
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.dates as mdates
+import numpy as np
 
-# Filstier til CSV-er
-file_path_air = 'data/refined_air_qualty_data.csv'
-file_path_weather = 'data/refined_weather_data.csv'
+class Graphs:
 
-# Funksjon for å importere CSV
-def import_for_analysis(file_path):
-    try:
-        df = pd.read_csv(file_path, sep=',', encoding='utf-8')
-        return df
-    except FileNotFoundError:
-        print(f"Error: Filen '{file_path}' ble ikke funnet.")
-        return None
+    def __init__(self):
+        self.df = None
 
-# Importer data
-df_air = import_for_analysis(file_path_air)
-df_weather = import_for_analysis(file_path_weather)
+    # ---------------------------------------------------
+    # CREATE DOT GRAPHIC VISUALISATION OF DATA
+    # ---------------------------------------------------
 
-# Konverter dato-kolonner
-if df_air is not None:
-    df_air['Date'] = pd.to_datetime(df_air['Date'])
-
-if df_weather is not None:
-    df_weather['Date'] = pd.to_datetime(df_weather['Date'])
-
-# Graf 1:----------- LUFTFORURENSNING SOM PUNKTER -------------
-if df_air is not None:
-    plt.figure(figsize=(12, 6))
-    sns.scatterplot(data=df_air, x='Date', y='NO', label='NO')
-    sns.scatterplot(data=df_air, x='Date', y='NO2', label='NO2')
-    sns.scatterplot(data=df_air, x='Date', y='NOx', label='NOx')
-    sns.scatterplot(data=df_air, x='Date', y='PM10', label='PM10')
-    sns.scatterplot(data=df_air, x='Date', y='PM2.5', label='PM2.5')
-    plt.title('Luftforurensning over tid (punktvis)')
-    plt.xlabel('Dato')
-    plt.ylabel('Konsentrasjon (µg/m³)')
-    plt.legend()
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
-
-# Graf 2:----------- VÆRDATA SOM PUNKTER -------------
-if df_weather is not None:
-    plt.figure(figsize=(12, 6))
-    if 'temperature (C)' in df_weather.columns:
-        sns.scatterplot(data=df_weather, x='Date', y='temperature (C)', label='Temperatur (°C)')
-    if 'precipitation (mm)' in df_weather.columns:
-        sns.scatterplot(data=df_weather, x='Date', y='precipitation (mm)', label='Nedbør (mm)')
-    if 'wind_speed (m/s)' in df_weather.columns:
-        sns.scatterplot(data=df_weather, x='Date', y='wind_speed (m/s)', label='Vindhastighet (m/s)')
-    plt.title('Værdata over tid (punktvis)')
-    plt.xlabel('Dato')
-    plt.ylabel('Målinger')
-    plt.legend()
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
-
-
-
-
-import pandas as pd
-import matplotlib.pyplot as plt
-
-# Importere data
-file_path_air = 'data/refined_air_qualty_data.csv'
-file_path_weather = 'data/refined_weather_data.csv'
-
-def import_for_analysis(file_path):
-    try:
-        df = pd.read_csv(file_path, sep=',', encoding='utf-8')
-        return df
-    except FileNotFoundError:
-        print(f"Error: Filen '{file_path}' ble ikke funnet.")
-        return None
-
-df_air = import_for_analysis(file_path_air)
-df_weather = import_for_analysis(file_path_weather)
-
-# Konvertere dato-kolonner til datetime
-if df_air is not None:
-    df_air['Date'] = pd.to_datetime(df_air['Date'])
-
-if df_weather is not None:
-    df_weather['Date'] = pd.to_datetime(df_weather['Date'])
-
-# ----------- Graf 3:: NO, NO2, NOx, PM2.5 og PM10 med Temperatur -------------
-if df_air is not None and df_weather is not None:
-    fig, ax1 = plt.subplots(figsize=(12, 6))
-
-    # Venstre y-akse for drivhusgasser (NO, NO2, NOx)
-    ax1.plot(df_air['Date'], df_air['NO'], label='NO', color='purple', lw=2)
-    ax1.plot(df_air['Date'], df_air['NO2'], label='NO2', color='green', lw=2)
-    ax1.plot(df_air['Date'], df_air['NOx'], label='NOx', color='red', lw=2)
-    ax1.plot(df_air['Date'], df_air['PM2.5'], label='PM2.5', color='yellow', lw=2)
-    ax1.plot(df_air['Date'], df_air['PM10'], label='PM10', color='orange', lw=2)
-
-    ax1.set_xlabel('Dato')
-    ax1.set_ylabel('Luftforurensning (µg/m³)', color='black')
-    ax1.tick_params(axis='y', labelcolor='black')
-
-    ax1.legend(loc='upper left')
-
-    # Sekundær y-akse for temperatur
-    ax2 = ax1.twinx()
-    ax2.plot(df_weather['Date'], df_weather['temperature (C)'], label='Temperatur (°C)', color='blue', lw=2)
+    """
+    Plots a scattergraph with multiple variables.
     
-    # Sett y-lim for temperatur
-    ax2.set_ylim(-30, 40)  
+    Args:
+        df (pd.DataFrame): DataFrame containing time-series data to plot.
+        columns (list): List of column names in 'df' to plot.
+        title (str): Title of the plot.
+        x_axis (str): Label for the x-axis.
+        y_axis (str): Label for the y-axis.
 
-    ax2.set_ylabel('Temperatur (°C)', color='blue')
-    ax2.tick_params(axis='y', labelcolor='blue')
+    """
 
-    ax2.legend(loc='upper right')
+    def dot_graph(self, df, columns, title, x_axis, y_axis):
 
-    plt.title('Luftforurensning (NO, NO2, NOx,PM2.5,PM10) og Temperatur')
+        # Create figure
+        plt.figure(figsize=(12, 6))
+        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
+        # Create scattergraph based on the given columns in the given dataframe
+        for i, column in enumerate(columns):
+            sns.scatterplot(data=df, x='Date', y=column, 
+                            label=column, 
+                            color=colors[i % len(colors)],
+                            alpha=0.7) # This line was written with assistane from AI (DeepSeek)
 
-# -----------  GRAF 4: PM10, PM2.5, NO, NOx, NO2 med Vindhastighet -------------
-if df_air is not None and df_weather is not None:
-    fig, ax1 = plt.subplots(figsize=(12, 6))
+        # Formatting
+        plt.title(title)
+        plt.xlabel(x_axis)
+        plt.ylabel(y_axis)
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+        plt.xticks(rotation=45)
+        plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator(minticks=8, maxticks=12)) 
+        plt.tight_layout()
+        plt.show()        
 
-    # Venstre y-akse for drivhusgasser (PM10, PM2.5)
-    ax1.plot(df_air['Date'], df_air['PM10'], label='PM10', color='purple', lw=2)
-    ax1.plot(df_air['Date'], df_air['PM2.5'], label='PM2.5', color='orange', lw=2)
-    ax1.plot(df_air['Date'], df_air['NO'], label='NO', color='blue', lw=2)
-    ax1.plot(df_air['Date'], df_air['NOx'], label='NOx', color='yellow', lw=2)
-    ax1.plot(df_air['Date'], df_air['NO2'], label='NO2', color='red', lw=2)
+    # ---------------------------------------------------
+    # CREATE COMPARATIVE GRAPH OF DATA AND PREDICTOR
+    # ---------------------------------------------------
 
-    ax1.set_xlabel('Dato')
-    ax1.set_ylabel('Luftforurensning (µg/m³)', color='black')
-    ax1.tick_params(axis='y', labelcolor='black')
+    """
+    Plots time-series data (primary y-axis) against a predictor variable (secondary y-axis) on twin axes.
+    Handles mismatched dates and ensures visual distinction between variables.
 
-    ax1.legend(loc='upper left')
+    Args:
+        df (pd.DataFrame): DataFrame containing time-series data to plot (primary axis).
+        columns (list): List of column names in `df` to plot.
+        df_predictor (pd.DataFrame): DataFrame containing the predictor variable (secondary axis).
+        predictor (str): Column name in `df_predictor` to plot.
+        title (str): Title of the plot.
+        x_axis (str): Label for the x-axis.
+        y1_axis (str): Label for the primary y-axis.
+        y_lims (tuple): Limits for the secondary y-axis.
+        zero_align (bool): If True, aligns 0 on both y-axis.
 
-    # Sekundær y-akse for vindhastighet
-    ax2 = ax1.twinx()
-    ax2.plot(df_weather['Date'], df_weather['wind_speed (m/s)'], label='Vindhastighet (m/s)', color='green', lw=2)
+    Notes:
+        This function will plot all the dates in both dataframes, regardless of if both dataframes have data on a givn date
+    """
+
+    def comparative_graph(self, df, columns, df_predictor, predictor, title, x_axis, y_axis, y_lims, zero_align):
+        
+        # Converting Date column to datetime if they aren't already
+        df['Date'] = pd.to_datetime(df['Date'])
+        df_predictor['Date'] = pd.to_datetime(df_predictor['Date'])
+
+        # Getting the full range of dates, min/max of both datasets
+        all_dates = pd.concat([df['Date'], df_predictor['Date']]) # This line was generated by AI (DeepSeek)
+        x_min, x_max = all_dates.min(), all_dates.max()
+
+        # Create figure
+        fig, ax1 = plt.subplots(figsize=(12, 6))
+        colors = plt.rcParams['axes.prop_cycle'].by_key()['color'] #This line was generate by AI (DeepSeek)
+
+        # The following block of code was generate with the help of AI
+        # Tool: DeepSeek
+        # Purpose: Creating plots with different colours based on the given columns
+
+        # Primary y-axis: Plot all dependent variables
+        for i, col in enumerate(columns):
+            ax1.plot(df['Date'], df[col], 
+                label=col, 
+                color=colors[i % len(colors)], 
+                lw=1,
+                alpha=0.7)
+            
+        # Calculate primary axis range with padding
+        y1_min = min(0, df[columns].min().min())
+        y1_max = df[columns].max().max()
+        y1_padding = (y1_max - y1_min) * 0.05
+        ax1.set_ylim(y1_min - y1_padding, y1_max + y1_padding)
+
+        # Secondary y-axis for independent variable
+        ax2 = ax1.twinx()
+        predictor_color = 'tab:red'
+        ax2.plot(df_predictor['Date'], df_predictor[predictor], 
+                 label=predictor, 
+                 color=predictor_color, 
+                 lw=2, 
+                 linestyle='--') # linestyle was suggested by AI (DeepSeek)
+ 
+        # Alignment of y-axis' if zero_align=True
+        if zero_align:
+            # Calculate the required shift to align zeros
+            fig.canvas.draw()  # Force layout calculation
+            
+            # Get data coordinates of zeros
+            y1_zero = ax1.transData.transform((0, 0))[1]  # Display y-coord of primary zero
+            y2_zero = ax2.transData.transform((0, 0))[1]  # Display y-coord of secondary zero
+            
+            # Calculate needed adjustment in data units
+            y2_data_per_pixel = (y_lims[1] - y_lims[0]) / ax2.bbox.height
+            required_shift = (y1_zero - y2_zero) * y2_data_per_pixel
+            
+            # Apply adjustment
+            current_lims = ax2.get_ylim()
+            ax2.set_ylim(current_lims[0] - required_shift, 
+                        current_lims[1] - required_shift)
+        else:
+            ax2.set_ylim(y_lims)
+
+        # Graph formatting
+        ax1.set_xlabel(x_axis)
+        ax1.set_ylabel(y_axis, color='black')
+        ax2.set_ylabel(predictor, color=predictor_color)
+        ax1.tick_params(axis='y', labelcolor='black')
+        ax2.tick_params(axis='y', labelcolor=predictor_color)
+        ax1.grid(True, alpha=0.3) 
+        ax1.set_xlim(x_min, x_max)
+        ax1.xaxis.set_major_locator(mdates.AutoDateLocator())
+
+        '''# Final adjustment for alignment
+        if zero_align:
+            # Get display coordinates of zeros
+            y1_zero_disp = ax1.transData.transform((0, 0))[1]
+            y2_zero_disp = ax2.transData.transform((0, 0))[1]
+            
+            # Calculate and apply needed adjustment
+            y2_adjust = (y1_zero_disp - y2_zero_disp) / ax2.transData.transform((0, 1))[1] * (y_lims[1] - y_lims[0])
+            current_lims = ax2.get_ylim()
+            ax2.set_ylim(current_lims[0] - y2_adjust, current_lims[1] - y2_adjust)
+        
+        else:
+            ax2.set_ylim(y_lims)  '''
+
+
+        ax1.legend(loc='upper left', framealpha=0.9)
+        ax2.legend(loc='upper right', framealpha=0.9)
+
+        plt.title(title, pad=20)
+        plt.xticks(rotation=45)
+        plt.subplots_adjust(top=0.9)
+        plt.tight_layout()
+        plt.show()
+
+
+
     
-    # Sett y-lim for vindhastighet
-    ax2.set_ylim(0, 10)  
 
-    ax2.set_ylabel('Vindhastighet (m/s)', color='green')
-    ax2.tick_params(axis='y', labelcolor='green')
 
-    ax2.legend(loc='upper right')
 
-    plt.title('Luftforurensning (PM10, PM2.5) og Vindhastighet')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
-
-# ----------- GRAF 5 NO, NO2, NOx, PM2.5,PM10 med Nedbør -------------
-if df_air is not None and df_weather is not None:
-    fig, ax1 = plt.subplots(figsize=(12, 6))
-
-    # Venstre y-akse for alle drivhusgasser
-    ax1.plot(df_air['Date'], df_air['NO'], label='NO', color='blue', lw=2)
-    ax1.plot(df_air['Date'], df_air['NO2'], label='NO2', color='green', lw=2)
-    ax1.plot(df_air['Date'], df_air['NOx'], label='NOx', color='red', lw=2)
-    ax1.plot(df_air['Date'], df_air['PM10'], label='PM10', color='purple', lw=2)
-    ax1.plot(df_air['Date'], df_air['PM2.5'], label='PM2.5', color='orange', lw=2)
-
-    ax1.set_xlabel('Dato')
-    ax1.set_ylabel('Luftforurensning (µg/m³)', color='black')
-    ax1.tick_params(axis='y', labelcolor='black')
-
-    ax1.legend(loc='upper left')
-
-    # Sekundær y-akse for nedbør
-    ax2 = ax1.twinx()
-    ax2.plot(df_weather['Date'], df_weather['precipitation (mm)'], label='Nedbør (mm)', color='black', lw=2)
-
-    # Sett y-lim for nedbør
-    ax2.set_ylim(0, 100)  
-
-    ax2.set_ylabel('Nedbør (mm)', color='black')
-    ax2.tick_params(axis='y', labelcolor='red')
-
-    ax2.legend(loc='upper right')
-
-    plt.title('Alle drivhusgasser og Nedbør')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
