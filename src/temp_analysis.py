@@ -120,6 +120,125 @@ for col in parameters:
         print(f"Column '{col}' not found in the DataFrame.")
 
 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns 
+
+
+#-----------------------------------
+
+sns.boxplot(df_air)
+
+# Create boxplots for each column
+sns.boxplot(data=df_air, orient='v')  # or orient='h' for horizontal boxplots
+
+plt.xlabel("Air pollutant")  # X-axis label
+plt.ylabel("Values")       # Y-axis label
+
+plt.title("Boxplot of air quality data")  # Optional title
+plt.show()
+
+
+# Table of outlier data for air quality data
+
+
+import pandas as pd
+import numpy as np
+
+# Select the columns to check
+cols_to_check = df_air.columns[1:5]
+
+# Function to identify outliers using IQR method
+def find_outliers(series):
+    Q1 = series.quantile(0.25)
+    Q3 = series.quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    return series[(series < lower_bound) | (series > upper_bound)]
+
+# Create outlier summary table
+outlier_table = {}
+for col in cols_to_check:
+    outliers = find_outliers(df_air[col])
+    outlier_table[col] = outliers.values.tolist()
+
+outlier_df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in outlier_table.items()]))
+print("Outlier Table:")
+print(outlier_df)
+
+# Create a copy of the DataFrame and replace outliers with NaN
+df_air_cleaned = df_air.copy()
+
+for col in cols_to_check:
+    outliers = find_outliers(df_air[col])
+    df_air_cleaned.loc[outliers.index, col] = np.nan
+
+print("\nModified DataFrame (outliers replaced with NaN):")
+print(df_air_cleaned[cols_to_check])
+
+
+
+
+
+#-----
+
+
+cols_to_plot = df_weather.columns[1:4]  # Columns at positions 1, 2, 3
+
+
+n_cols = len(cols_to_plot)
+
+# Create subplots — one row per selected column
+fig, axes = plt.subplots(nrows=n_cols, ncols=1, figsize=(6, 4 * n_cols))
+
+# Loop through selected columns and axes
+for ax, col in zip(axes, cols_to_plot):
+    sns.boxplot(y=df_weather[col], ax=ax)
+    ax.set_title(f'Boxplot of {col}')
+    ax.set_ylabel(f'{col} Value')
+    ax.set_xlabel('')
+
+plt.tight_layout()
+plt.show()
+
+#Outlier data for WEATHER data
+
+import pandas as pd
+import numpy as np
+
+# Select the columns to check
+cols_to_check = df_weather.columns[1:4]
+
+# Function to identify outliers using IQR method
+def find_outliers(series):
+    Q1 = series.quantile(0.25)
+    Q3 = series.quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    return series[(series < lower_bound) | (series > upper_bound)]
+
+# Create outlier summary table
+outlier_table = {}
+for col in cols_to_check:
+    outliers = find_outliers(df_weather[col])
+    outlier_table[col] = outliers.values.tolist()
+
+outlier_df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in outlier_table.items()]))
+print("Outlier Table:")
+print(outlier_df)
+
+# Create a copy of the DataFrame and replace outliers with NaN
+df_weather_cleaned = df_weather.copy()
+
+for col in cols_to_check:
+    outliers = find_outliers(df_weather[col])
+    df_weather_cleaned.loc[outliers.index, col] = np.nan
+
+print("\nModified DataFrame (outliers replaced with NaN):")
+print(df_weather_cleaned[cols_to_check])
 
 
 
