@@ -1,163 +1,94 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
-
-# Last inn datasett
-df_air = pd.read_csv('data/refined_air_qualty_data.csv', parse_dates=['Date'])
-df_weather = pd.read_csv('data/refined_weather_data.csv', parse_dates=['Date'])
-
-# Merge datasett på felles kolonne 'Date'
-df = pd.merge(df_air, df_weather, on='Date')
-
-# Sjekk for manglende verdier
-missing = df.isna().sum()
-print("Manglende verdier:\n", missing)
-
-# Enkel imputasjon: fyll ut med gjennomsnitt
-df.fillna(df.mean(numeric_only=True), inplace=True)
-
-
-
-plt.figure(figsize=(10, 5))
-sns.lineplot(data=df, x='Date', y='NOx', color='tomato')
-plt.title('Utvikling av NOx-nivå over tid')
-plt.xlabel('Dato')
-plt.ylabel('NOx (µg/m³)')
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.show()
-
-
-#visualisering søylediagram
-avg_pollution = df[['NO', 'NO2', 'NOx', 'PM10', 'PM2.5']].mean()
-avg_pollution.plot(kind='bar', color=sns.color_palette("Set2"))
-plt.title('Gjennomsnittlige verdier av luftforurensning')
-plt.ylabel('µg/m³')
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.show()
-
-
-
-#scatteplot med regresjonslinje
-plt.figure(figsize=(8, 6))
-sns.regplot(x='temperature (C)', y='NOx', data=df, scatter_kws={'alpha':0.5})
-plt.title('Sammenheng mellom temperatur og NOx')
-plt.xlabel('Temperatur (°C)')
-plt.ylabel('NOx (µg/m³)')
-plt.tight_layout()
-plt.show()
-
-
-
-import missingno as msno
-
-# Visualisering av manglende verdier????
-msno.matrix(df_air)
-plt.title('Manglende verdier i luftdata')
-plt.show()
-
-
-
-#evaluering for alle drivhusgassene
-# Funksjoner (X) er de samme for alle modeller
-X = df[['temperature (C)', 'wind_speed (m/s)', 'precipitation (mm)']]
-
-# Liste over målvariabler
-pollutants = ['NO', 'NO2', 'NOx', 'PM10', 'PM2.5']
-
-print("Evaluering av lineær regresjonsmodell for hver luftforurensningskomponent:\n")
-
-for pollutant in pollutants:
-    y = df[pollutant]
-    
-    # Splitte data
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
-
-    # Trene modell
-    model = LinearRegression()
-    model.fit(X_train, y_train)
-
-    # Prediksjon
-    y_pred = model.predict(X_test)
-
-    # Evaluering
-    r2 = r2_score(y_test, y_pred)
-    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-
-    print(f"{pollutant} ➤ R²: {r2:.3f} | RMSE: {rmse:.3f}")
-
-
-
-
-
-#fretidige verdier for alle drivhusgasser (en måned)
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-
-# Generer datoer for én måned fremover
-start_date = datetime(2025, 5, 1)
-future_dates = [start_date + timedelta(days=i) for i in range(30)]
-
-# Simulér værdata (du kan bruke gjennomsnitt eller tilfeldig variasjon)
-np.random.seed(42)  # for reproduserbarhet
-
-future_weather = pd.DataFrame({
-    'Date': future_dates,
-    'temperature (C)': np.random.normal(loc=10, scale=5, size=30),  # gj.snitt 10°C
-    'wind_speed (m/s)': np.random.normal(loc=3, scale=1, size=30),  # gj.snitt 3 m/s
-    'precipitation (mm)': np.random.exponential(scale=1.0, size=30)  # regn er mer uforutsigbart
-})
-# Lagre alle modeller og målvariabler
-pollutants = ['NO', 'NO2', 'NOx', 'PM10', 'PM2.5']
-predictions = {}
-
-for pollutant in pollutants:
-    # Målvariabel
-    y = df[pollutant]
-
-    # Treningsdata
-    X = df[['temperature (C)', 'wind_speed (m/s)', 'precipitation (mm)']]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # Modelltrening
-    model = LinearRegression()
-    model.fit(X_train, y_train)
-
-    # Prediksjoner for fremtidig vær
-    pred = model.predict(future_weather[['temperature (C)', 'wind_speed (m/s)', 'precipitation (mm)']])
-    predictions[pollutant] = pred
-
-
-
-
-#lage graf for alle drivhusgassene over tid (30 dager)
+from sklearn.pipeline import make_pipeline
 import matplotlib.pyplot as plt
+import os
+from sklearn.metrics import mean_squared_error
 
-# Legg til prediksjoner i DataFrame
-for pollutant in pollutants:
-    future_weather[pollutant] = predictions[pollutant]
+# Oppsett
+data_dir = 'data'
+filename = 'refined_weather_data.csv'
+filepath = os.path.join(data_dir, filename)
 
-# Plot alle drivhusgassene over tid
-plt.figure(figsize=(14, 7))
+def find_optimal_degree(X, y, max_degree=5):
+    """Finner optimal polynomgrad ved kryssvalidering"""
+    degrees = range(1, max_degree+1)
+    mse_scores = []
+    
+    for degree in degrees:
+        model = make_pipeline(
+            PolynomialFeatures(degree=degree, include_bias=False),
+            LinearRegression()
+        )
+        scores = -cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error')
+        mse_scores.append(np.mean(scores))
+    
+    optimal_degree = degrees[np.argmin(mse_scores)]
+    return optimal_degree, mse_scores
 
-for pollutant in pollutants:
-    plt.plot(future_weather['Date'], future_weather[pollutant], label=pollutant)
+try:
+    # Laster data
+    df = pd.read_csv(filepath)
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['DayOfYear'] = df['Date'].dt.dayofyear
+    
+    # Forbereder data
+    X = df[['DayOfYear']]  # Bruker kun dagnummer for enklere visualisering
+    y = df['temperature (C)']
+    
+    # Finner optimal grad
+    optimal_degree, mse_scores = find_optimal_degree(X, y, max_degree=6)
+    print(f"Optimal polynomgrad funnet: {optimal_degree}")
+    
+    # Trener modell med optimal grad
+    model = make_pipeline(
+        PolynomialFeatures(degree=optimal_degree, include_bias=False),
+        LinearRegression()
+    )
+    model.fit(X, y)
+    
+    # Genererer glatt kurve for plotting
+    days = np.linspace(1, 366, 500).reshape(-1, 1)
+    y_vis = model.predict(days)
+    
+    # Plotting
+    plt.figure(figsize=(14, 7))
+    
+    # Faktiske data
+    plt.scatter(df['DayOfYear'], df['temperature (C)'], 
+                color='#2ecc71', alpha=0.6, label='Faktiske målinger', s=30)
+    
+    # Modellkurve
+    plt.plot(days, y_vis, color='#e67e22', linewidth=3, 
+             label=f'Polynomisk tilpasning (grad {optimal_degree})')
+    
+    # Formatering
+    plt.xlabel('Dag i året', fontsize=13)
+    plt.ylabel('Temperatur (°C)', fontsize=13)
+    plt.title(f'Temperaturutvikling gjennom året\n(Best passende polynomgrad: {optimal_degree})', fontsize=15)
+    plt.legend(fontsize=12, loc='upper right')
+    plt.grid(True, alpha=0.2)
+    
+    # Månedsmerker
+    month_pos = [15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345]
+    month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 
+                  'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des']
+    plt.xticks(month_pos, month_names, fontsize=11)
+    
+    # Legg til RMSE i plottet
+    y_pred = model.predict(X)
+    rmse = np.sqrt(mean_squared_error(y, y_pred))
+    plt.text(0.02, 0.05, f'RMSE: {rmse:.2f}°C', 
+             transform=plt.gca().transAxes, fontsize=12,
+             bbox=dict(facecolor='white', alpha=0.8))
+    
+    plt.tight_layout()
+    plt.show()
 
-plt.title('Predikterte nivåer av luftforurensning i løpet av én måned')
-plt.xlabel('Dato')
-plt.ylabel('Konsentrasjon (µg/m³)')
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.legend()
-plt.tight_layout()
-plt.show()
-
-
+except FileNotFoundError:
+    print(f"Kunne ikke finne filen: {filepath}")
+except Exception as e:
+    print(f"Feil under kjøring: {str(e)}")
