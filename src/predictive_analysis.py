@@ -92,4 +92,3 @@ except FileNotFoundError:
     print(f"Kunne ikke finne filen: {filepath}")
 except Exception as e:
     print(f"Feil under kjøring: {str(e)}")
-    
