@@ -1,94 +1,106 @@
+
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 import matplotlib.pyplot as plt
 import os
-from sklearn.metrics import mean_squared_error
 
-# Oppsett
+# Sett opp filbane
 data_dir = 'data'
 filename = 'refined_weather_data.csv'
 filepath = os.path.join(data_dir, filename)
 
-def find_optimal_degree(X, y, max_degree=5):
-    """Finner optimal polynomgrad ved kryssvalidering"""
-    degrees = range(1, max_degree+1)
-    mse_scores = []
+def load_and_clean_data(filepath):
+    """Laster og renser data med grundig NaN-håndtering"""
+    try:
+        df = pd.read_csv(filepath)
+        
+        # Konverter kolonner - mer robust håndtering
+        df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+        df['temperature (C)'] = pd.to_numeric(df['temperature (C)'], errors='coerce')
+        
+        # Fjern ugyldige rader
+        df = df.dropna(subset=['Date', 'temperature (C)'])
+        
+        # Sjekk for tomme datasett
+        if df.empty:
+            raise ValueError("Ingen gyldige data etter rensing")
+            
+        # Lag tidsfunksjoner
+        df['DayOfYear'] = df['Date'].dt.dayofyear
+        df['Year'] = df['Date'].dt.year
+        
+        return df
     
-    for degree in degrees:
-        model = make_pipeline(
-            PolynomialFeatures(degree=degree, include_bias=False),
-            LinearRegression()
-        )
-        scores = -cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error')
-        mse_scores.append(np.mean(scores))
-    
-    optimal_degree = degrees[np.argmin(mse_scores)]
-    return optimal_degree, mse_scores
+    except Exception as e:
+        print(f"Feil under datalasting: {str(e)}")
+        return None
 
+# Hovedanalyse
 try:
-    # Laster data
-    df = pd.read_csv(filepath)
-    df['Date'] = pd.to_datetime(df['Date'])
-    df['DayOfYear'] = df['Date'].dt.dayofyear
+    # 1. Datainnlasting
+    df = load_and_clean_data(filepath)
+    if df is None:
+        raise SystemExit("Kunne ikke laste data")
     
-    # Forbereder data
-    X = df[['DayOfYear']]  # Bruker kun dagnummer for enklere visualisering
-    y = df['temperature (C)']
+    print(f"Antall datapunkter: {len(df)}")
+    print(f"Periode: {df['Date'].min().date()} til {df['Date'].max().date()}")
     
-    # Finner optimal grad
-    optimal_degree, mse_scores = find_optimal_degree(X, y, max_degree=6)
-    print(f"Optimal polynomgrad funnet: {optimal_degree}")
+    # 2. Forbered data - ekstra NaN-sjekk
+    X = df[['DayOfYear']].values
+    y = df['temperature (C)'].values
     
-    # Trener modell med optimal grad
+    if np.isnan(y).any():
+        raise ValueError("NaN-verdier oppdaget i temperaturdata etter rensing")
+    
+    # 3. Modellering
     model = make_pipeline(
-        PolynomialFeatures(degree=optimal_degree, include_bias=False),
+        PolynomialFeatures(degree=3, include_bias=False),
         LinearRegression()
     )
     model.fit(X, y)
     
-    # Genererer glatt kurve for plotting
-    days = np.linspace(1, 366, 500).reshape(-1, 1)
-    y_vis = model.predict(days)
+    # 4. Visualisering
+    plt.figure(figsize=(14, 8))
     
-    # Plotting
-    plt.figure(figsize=(14, 7))
+    # Plott hvert år med egen farge
+    years = df['Year'].unique()
+    colors = plt.cm.viridis(np.linspace(0, 1, len(years)))
     
-    # Faktiske data
-    plt.scatter(df['DayOfYear'], df['temperature (C)'], 
-                color='#2ecc71', alpha=0.6, label='Faktiske målinger', s=30)
+    for i, year in enumerate(years):
+        year_data = df[df['Year'] == year]
+        plt.scatter(year_data['DayOfYear'], year_data['temperature (C)'],
+                   color=colors[i], alpha=0.6, label=str(year), s=10)
     
-    # Modellkurve
-    plt.plot(days, y_vis, color='#e67e22', linewidth=3, 
-             label=f'Polynomisk tilpasning (grad {optimal_degree})')
+    # Plott trendlinje
+    days = np.linspace(1, 366, 366)
+    y_pred = model.predict(days.reshape(-1, 1))
+    plt.plot(days, y_pred, 'r-', linewidth=3, label='Sesongtrend')
     
     # Formatering
-    plt.xlabel('Dag i året', fontsize=13)
-    plt.ylabel('Temperatur (°C)', fontsize=13)
-    plt.title(f'Temperaturutvikling gjennom året\n(Best passende polynomgrad: {optimal_degree})', fontsize=15)
-    plt.legend(fontsize=12, loc='upper right')
-    plt.grid(True, alpha=0.2)
-    
-    # Månedsmerker
-    month_pos = [15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345]
-    month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 
-                  'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des']
-    plt.xticks(month_pos, month_names, fontsize=11)
-    
-    # Legg til RMSE i plottet
-    y_pred = model.predict(X)
-    rmse = np.sqrt(mean_squared_error(y, y_pred))
-    plt.text(0.02, 0.05, f'RMSE: {rmse:.2f}°C', 
-             transform=plt.gca().transAxes, fontsize=12,
-             bbox=dict(facecolor='white', alpha=0.8))
-    
+    plt.xlabel('Dag i året', fontsize=12)
+    plt.ylabel('Temperatur (°C)', fontsize=12)
+    plt.title(f'Temperaturanalyse ({len(years)} års data)', fontsize=14)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.grid(alpha=0.2)
     plt.tight_layout()
     plt.show()
 
-except FileNotFoundError:
-    print(f"Kunne ikke finne filen: {filepath}")
 except Exception as e:
-    print(f"Feil under kjøring: {str(e)}")
+    print(f"\nFEIL: {str(e)}")
+    
+    # Diagnostikk hvis feil oppstår
+    if 'df' in locals():
+        print("\nDatadiagnostikk:")
+        print(f"Antall NaN i temperatur: {df['temperature (C)'].isna().sum()}")
+        print("Eksempel på data:")
+        print(df.head())
+        print("\nDatoer med NaN temperatur:")
+        print(df[df['temperature (C)'].isna()]['Date'].head())
+    
+    print("\nVanlige årsaker til denne feilen:")
+    print("1. Manglende eller ugyldige temperaturverdier i CSV-filen")
+    print("2. Problemer med desimalseparator (f.eks. komma istedenfor punktum)")
+    print("3. Ugyldige datoformat som forhindrer korrekt parsing")
