@@ -6,66 +6,46 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 import matplotlib.pyplot as plt
 import os
+from datetime import datetime, timedelta
 
-# Sett opp filbane
-data_dir = 'data'
-filename = 'refined_weather_data.csv'
-filepath = os.path.join(data_dir, filename)
+# ---------------------- #
+# Felles funksjoner      #
+# ---------------------- #
 
-def load_and_clean_data(filepath):
-    """Laster og renser data med grundig NaN-håndtering"""
+def load_and_prepare_data(filepath):
+    """Laster og forbereder data for begge analyser"""
     try:
-        df = pd.read_csv(filepath)
-        
-        # Konverter kolonner - mer robust håndtering
-        df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+        df = pd.read_csv(filepath, parse_dates=['Date'])
         df['temperature (C)'] = pd.to_numeric(df['temperature (C)'], errors='coerce')
-        
-        # Fjern ugyldige rader
         df = df.dropna(subset=['Date', 'temperature (C)'])
         
-        # Sjekk for tomme datasett
         if df.empty:
             raise ValueError("Ingen gyldige data etter rensing")
             
-        # Lag tidsfunksjoner
         df['DayOfYear'] = df['Date'].dt.dayofyear
         df['Year'] = df['Date'].dt.year
-        
         return df
     
     except Exception as e:
         print(f"Feil under datalasting: {str(e)}")
         return None
 
-# Hovedanalyse
-try:
-    # 1. Datainnlasting
-    df = load_and_clean_data(filepath)
-    if df is None:
-        raise SystemExit("Kunne ikke laste data")
-    
-    print(f"Antall datapunkter: {len(df)}")
-    print(f"Periode: {df['Date'].min().date()} til {df['Date'].max().date()}")
-    
-    # 2. Forbered data - ekstra NaN-sjekk
-    X = df[['DayOfYear']].values
-    y = df['temperature (C)'].values
-    
-    if np.isnan(y).any():
-        raise ValueError("NaN-verdier oppdaget i temperaturdata etter rensing")
-    
-    # 3. Modellering
-    model = make_pipeline(
-        PolynomialFeatures(degree=3, include_bias=False),
+def create_model(degree=3):
+    """Oppretter polynomisk regresjonsmodell"""
+    return make_pipeline(
+        PolynomialFeatures(degree=degree, include_bias=False),
         LinearRegression()
     )
-    model.fit(X, y)
-    
-    # 4. Visualisering
+
+# ---------------------- #
+# Analyse 1: Historisk   #
+# ---------------------- #
+
+def plot_historical_trends(df, model):
+    """Visualiser historiske data med trendlinje"""
     plt.figure(figsize=(14, 8))
     
-    # Plott hvert år med egen farge
+    # Fargekoding for år
     years = df['Year'].unique()
     colors = plt.cm.viridis(np.linspace(0, 1, len(years)))
     
@@ -74,12 +54,11 @@ try:
         plt.scatter(year_data['DayOfYear'], year_data['temperature (C)'],
                    color=colors[i], alpha=0.6, label=str(year), s=10)
     
-    # Plott trendlinje
+    # Trendlinje
     days = np.linspace(1, 366, 366)
-    y_pred = model.predict(days.reshape(-1, 1))
-    plt.plot(days, y_pred, 'r-', linewidth=3, label='Sesongtrend')
+    plt.plot(days, model.predict(days.reshape(-1, 1)), 
+             'r-', linewidth=3, label='Sesongtrend')
     
-    # Formatering
     plt.xlabel('Dag i året', fontsize=12)
     plt.ylabel('Temperatur (°C)', fontsize=12)
     plt.title(f'Temperaturanalyse ({len(years)} års data)', fontsize=14)
@@ -88,19 +67,92 @@ try:
     plt.tight_layout()
     plt.show()
 
-except Exception as e:
-    print(f"\nFEIL: {str(e)}")
+# ---------------------- #
+# Analyse 2: Prognose    #
+# ---------------------- #
+
+def predict_future_temperatures(model, last_date, years=1):
+    """Predikerer fremtidige temperaturer"""
+    future_dates = [last_date + timedelta(days=x) for x in range(1, 365*years + 1)]
     
-    # Diagnostikk hvis feil oppstår
-    if 'df' in locals():
-        print("\nDatadiagnostikk:")
-        print(f"Antall NaN i temperatur: {df['temperature (C)'].isna().sum()}")
-        print("Eksempel på data:")
-        print(df.head())
-        print("\nDatoer med NaN temperatur:")
-        print(df[df['temperature (C)'].isna()]['Date'].head())
+    future_df = pd.DataFrame({
+        'Date': future_dates,
+        'DayOfYear': [x.dayofyear for x in future_dates]
+    })
     
-    print("\nVanlige årsaker til denne feilen:")
-    print("1. Manglende eller ugyldige temperaturverdier i CSV-filen")
-    print("2. Problemer med desimalseparator (f.eks. komma istedenfor punktum)")
-    print("3. Ugyldige datoformat som forhindrer korrekt parsing")
+    future_df['Predicted_Temp'] = model.predict(future_df[['DayOfYear']])
+    return future_df
+
+def plot_forecast(df, future_df):
+    """Visualiser historiske data og prognose"""
+    plt.figure(figsize=(14, 7))
+    
+    plt.scatter(df['Date'], df['temperature (C)'], 
+                color='blue', alpha=0.3, label='Historiske data')
+    plt.plot(future_df['Date'], future_df['Predicted_Temp'], 
+             'r-', linewidth=2, label='Predikert temperatur')
+    
+    plt.xlabel('Dato')
+    plt.ylabel('Temperatur (°C)')
+    plt.title('Temperaturprognose basert på historiske data')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+# ---------------------- #
+# Hovedprogram           #
+# ---------------------- #
+
+def main():
+    # Konfigurasjon
+    data_dir = 'data'
+    filename = 'refined_weather_data.csv'
+    filepath = os.path.join(data_dir, filename)
+    
+    try:
+        # Del 1: Last og forbered data
+        df = load_and_prepare_data(filepath)
+        if df is None:
+            return
+            
+        print(f"\nData statistikk:")
+        print(f"Antall datapunkter: {len(df):,}")
+        print(f"Periode: {df['Date'].min().date()} til {df['Date'].max().date()}")
+        print(f"Antall år: {len(df['Year'].unique())}")
+        
+        # Del 2: Historisk analyse
+        print("\nKjører historisk analyse...")
+        hist_model = create_model(degree=3)
+        hist_model.fit(df[['DayOfYear']], df['temperature (C)'])
+        plot_historical_trends(df, hist_model)
+        
+        # Del 3: Prognoseanalyse
+        print("\nGenererer temperaturprognose...")
+        forecast_model = create_model(degree=4)
+        forecast_model.fit(df[['DayOfYear']], df['temperature (C)'])
+        
+        future_df = predict_future_temperatures(
+            forecast_model, 
+            df['Date'].max(), 
+            years=5
+        )
+        
+        plot_forecast(df, future_df)
+        
+        # Lagre prognose
+        future_df[['Date', 'Predicted_Temp']].to_csv(
+            os.path.join(data_dir, 'temperature_forecast.csv'), 
+            index=False
+        )
+        print("\nPrognose lagret til 'data/temperature_forecast.csv'")
+        
+    except Exception as e:
+        print(f"\nFEIL: {str(e)}")
+        if 'df' in locals():
+            print("\nDatadiagnostikk:")
+            print(f"NaN-verdier: {df['temperature (C)'].isna().sum()}")
+            print("Eksempeldata:\n", df.head())
+
+if __name__ == "__main__":
+    main()
