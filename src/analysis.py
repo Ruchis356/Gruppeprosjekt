@@ -1,5 +1,6 @@
 
 import pandas as pd
+import numpy as np
 
 class AnalysedData:
 
@@ -158,10 +159,13 @@ class AnalysedData:
 
     def outliers(self, df, column_names, standard_deviation, average, sd_modifier):    
 
+        date_column = df.columns[0]
+        numeric_columns = [col for col in column_names if col != date_column]
+
         outlier_table = {}
         df_x_outliers = df.copy()
 
-        for col in column_names:
+        for col in numeric_columns:
 
             # Get the standard deviation for the current column
             std_row = standard_deviation[standard_deviation.iloc[:, 0] == col]
@@ -171,15 +175,24 @@ class AnalysedData:
             avg_row = average[average.iloc[:, 0] == col]
             col_avg = avg_row.iloc[0, 1] if not avg_row.empty else 0  # Default to 0 if not found
 
+            # Calculate bounds and find outliers
             lower_bound = col_avg - col_std*sd_modifier
             upper_bound = col_avg + col_std*sd_modifier
-
             column_outliers = df[col][(df[col] < lower_bound) | (df[col] > upper_bound)]
             outlier_table[col] = column_outliers.values.tolist()
 
-            df_x_outliers.loc[outlier_table.index, col] = np.nan
+            # Mark outliers as NaN
+            df_x_outliers.loc[column_outliers.index, col] = np.nan
         
-        outliers_df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in outlier_table.items()]))
+#        outliers_df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in outlier_table.items()]))
+
+        # Convert to DataFrame and add dates
+        outliers_df = pd.DataFrame(outlier_table)
+        outliers_df[date_column] = df.loc[outliers_df.index, date_column]
+        
+        # Reorder to put date column first
+        cols = [date_column] + numeric_columns
+        outliers_df = outliers_df[cols]
 
         return outliers_df, df_x_outliers
 
