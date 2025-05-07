@@ -66,6 +66,46 @@ class AnalysedData:
         # Returns the dataframe with Date and all valid columns
         weekly_data[date_column] = weekly_dates 
         return pd.DataFrame(weekly_data)[[date_column] + valid_columns]
+    
+    # ------------------------------------------
+    # CALCULATING TOTAL AVERAGES
+    # ------------------------------------------
+
+    """
+    Calculates averages for specified columns and returns a DataFrame.
+    
+    Args:
+        df: Input DataFrame
+        column_names: List of column names to analyze
+            
+    Returns:
+        pd.DataFrame: Two columns ["Metric", "Average"]
+            Rows correspond to input columns.
+    """
+
+    def total_average(self, df, column_names):
+
+        averages = []
+
+        # Checking for missing or invalid columns to exclude them from the calculations
+        valid_columns = [col for col in column_names if col in df.columns]
+        if missing_cols := set(column_names) - set(valid_columns):
+            print(f"Warning: Column(s) '{missing_cols}' not found in DataFrame. Skipping...")
+
+        if not valid_columns:
+            print("Error: No valid columns to process.")
+            return None
+
+        # Calculate avrage for each column and returning a list
+        for col in column_names:
+            if col in df.columns:
+                average = df[col].mean()
+                averages.append({"Metric": col, "Average": average})
+            else:
+                print(f"Column '{col}' not found in the DataFrame. Skipping...")
+                averages.append({"Metric": col, "Average": None})
+        
+        return pd.DataFrame(averages)
 
 
     # ------------------------------------------
@@ -98,5 +138,73 @@ class AnalysedData:
                 standard_deviations.append({"Metric": col, "Standard Deviation": None})
         
         return pd.DataFrame(standard_deviations)
+    
+    # ------------------------------------------
+    # IDENTIFYING OUTLIERS
+    # ------------------------------------------
+
+    """
+    Identifies outliers in the given dataset with the given standard deviation
+    
+    Args:
+        df: Input DataFrame
+        column_name: The column of data to be analysed
+        standard_devition: The standard deviation belonging to the column of data
+            
+    Returns:
+        pd.DataFrame: Date column + datapoints that are outliers
+        None: If no outliers are found, or invalid data is input
+    """
+
+    def outliers(self, df, column_names, standard_deviation, average, sd_modifier):    
+
+        outlier_table = {}
+        df_x_outliers = df.copy()
+
+        for col in column_names:
+
+            # Get the standard deviation for the current column
+            std_row = standard_deviation[standard_deviation.iloc[:, 0] == col]
+            col_std = std_row.iloc[0, 1] if not std_row.empty else 0  # Default to 0 if not found
+            
+            # Get the average for the current column
+            avg_row = average[average.iloc[:, 0] == col]
+            col_avg = avg_row.iloc[0, 1] if not avg_row.empty else 0  # Default to 0 if not found
+
+            lower_bound = col_avg - col_std*sd_modifier
+            upper_bound = col_avg + col_std*sd_modifier
+
+            column_outliers = df[col][(df[col] < lower_bound) | (df[col] > upper_bound)]
+            outlier_table[col] = column_outliers.values.tolist()
+
+            df_x_outliers.loc[outlier_table.index, col] = np.nan
+        
+        outliers_df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in outlier_table.items()]))
+
+        return outliers_df, df_x_outliers
 
 
+'''
+
+    def outliers(self, df, column_names, standard_deviation):    
+
+        outlier_table = {}
+        df_x_outliers = ()
+
+        for col in column_names:
+            Q1 = df[col].quantile(0.25, 0, True, 'interpolation')
+            Q3 = df[col].quantile(0.75, 0, True, 'Interpolation')
+            IQR = Q3 - Q1
+            lower_bound = Q1 - 1.5 * IQR
+            upper_bound = Q3 + 1.5 * IQR
+            column_outliers = df[col][(df[col] < lower_bound) | (df[col] > upper_bound)]
+            outlier_table[col] = column_outliers.values.tolist()
+        
+        outliers_df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in outlier_table.items()]))
+
+        for col in column_names:
+            df_x_outliers.loc[outlier_table.index, col] = np.nan
+
+        return outliers_df, df_x_outliers
+
+'''
