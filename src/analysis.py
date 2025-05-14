@@ -28,6 +28,11 @@ class AnalysedData:
         weekly_data = {}
 
         # Checking for missing or invalid columns to exclude them from the calculations
+
+        # This construct has been refined by the use of AI
+        # Purpose: Providing a more efficient way of printing weekly averages for weeks with missing data, by using commands such as "if missing_cols := set(column_names) - set(valid_columns):"
+        # Tool: ChatGPT
+
         valid_columns = [col for col in column_names if col in df.columns]
         if missing_cols := set(column_names) - set(valid_columns):
             print(f"Warning: Column(s) '{missing_cols}' not found in DataFrame. Skipping...")
@@ -65,6 +70,10 @@ class AnalysedData:
             weekly_data[column] = weekly_averages               
 
         # Returns the dataframe with Date and all valid columns
+        # This construct was refined with the assistance of AI 
+        # Use of AI was implemented to suggest how adaptions are made to dataframes by new code 
+        # Source: ChatGPT
+
         weekly_data[date_column] = weekly_dates 
         return pd.DataFrame(weekly_data)[[date_column] + valid_columns]
     
@@ -83,6 +92,9 @@ class AnalysedData:
         pd.DataFrame: Two columns ["Metric", "Average"]
             Rows correspond to input columns.
     """
+# This construct was refined with the assistance of AI 
+        # Use of AI was implemented to pinpoint an explain error messages that were received while running the code. 
+        # Source: ChatGPT
 
     def total_average(self, df, column_names):
 
@@ -97,7 +109,7 @@ class AnalysedData:
             print("Error: No valid columns to process.")
             return None
 
-        # Calculate avrage for each column and returning a list
+        # Calculate average for each column and returning a list
         for col in column_names:
             if col in df.columns:
                 average = df[col].mean()
@@ -124,6 +136,10 @@ class AnalysedData:
         pd.DataFrame: Two columns ["Metric", "Standard Deviation"]
             Rows correspond to input columns.
     """
+
+        # This construct was refined with the assistance of AI 
+        # Use of AI was implemented to pinpoint an explain error messages that were received while running the code. 
+        # Source: ChatGPT
 
     def standard_deviation(self, df, column_names):
 
@@ -157,6 +173,10 @@ class AnalysedData:
         None: If no outliers are found, or invalid data is input
     """
 
+     # This construct was refined with the assistance of AI 
+        # Use of AI was implemented to suggest shorter code lines for calling standard deviation and average values from data frames. 
+        # Use of AI was implemented to suggest and explain error codes received while running the code. 
+        # Source: ChatGPT
     def outliers(self, df, column_names, standard_deviation, average, sd_modifier):    
 
         date_column = df.columns[0]
