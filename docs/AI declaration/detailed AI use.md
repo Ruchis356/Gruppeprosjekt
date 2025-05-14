@@ -51,6 +51,16 @@ General/no file
 
 README.me (main readme)
 
+README (src):
+
+- Structure and format has been suggested by the use of AI 
+- Phrasing and definitions have been suggested by AI
+
+README (notebooks): 
+
+- Grammar and punctuation has been enhanced by the use of AI
+
+
 analysis.py:
 
     - AI suggested efficient ways of calculating weekly data, by taking into consideration of weeks with missing data, by using the df_week.dropna() and avg_value = df_clean.mean() code line, such that weekly averages were costumized for their available data values. 
@@ -65,4 +75,4 @@ General/no file
     - AI suggested various formats for AI disclosure within the code.
 
 
-# This information is currently missing and will be added asap by going through chat history
+
