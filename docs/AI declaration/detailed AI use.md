@@ -51,16 +51,13 @@ General/no file
 
 README.me (main readme)
 
-temp_analysis.py:
+analysis.py:
 
+    - AI suggested efficient ways of calculating weekly data, by taking into consideration of weeks with missing data, by using the df_week.dropna() and avg_value = df_clean.mean() code line, such that weekly averages were costumized for their available data values. 
     - Use of AI was implemented to suggest ways of importing air quality data as file paths and storing these as data frames using the "with open(file_path, 'r', encoding='utf-8') as file:" codeline
     - AI was used to test and fix any error messages regaridng the boxplot diagrams, and suggesting ways of making graphs more visually pleasing 
     - AI suggested a way of using the average function on multiple pollutants by using the codeline " weekly_avg_table = build_weekly_avg_table(df_air, pollutants)"
     - Use of AI was implemented to add calcualted outlier values to the exisitng data frames
-
-analysis.py:
-
-    - AI suggested efficient ways of calculating weekly data, by taking into consideration of weeks with missing data, by using the df_week.dropna() and avg_value = df_clean.mean() code line, such that weekly averages were costumized for their available data values. 
 
 General/no file
     - AI was semi-regularly used for more accurately interpreting error codes and to pinpoint what problems needed to be solved, as well as suggesting different ways of handling errors and how to improve error handling in general.
