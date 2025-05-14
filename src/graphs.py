@@ -167,7 +167,23 @@ class Graphs:
         plt.tight_layout()
         plt.show()
 
+    # ---------------------------------------------------
+    # CREATE BOX PLOT WITH OUTLIERS
+    # ---------------------------------------------------
 
+    """
+    Plots a box plot including outliers
+    
+    Args:
+        df (pd.DataFrame): DataFrame containing time-series data to plot.
+        columns (list): List of column names in 'df' to plot.
+        title (str): Title of the plot.
+        x_axis (str): Label for the x-axis.
+        y_axis (str): Label for the y-axis.
+
+    """
+
+#    def do
 
     
 
