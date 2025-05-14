@@ -62,5 +62,10 @@ analysis.py:
 
     - AI suggested efficient ways of calculating weekly data, by taking into consideration of weeks with missing data, by using the df_week.dropna() and avg_value = df_clean.mean() code line, such that weekly averages were costumized for their available data values. 
 
+General/no file
+    - AI was semi-regularly used for more accurately interpreting error codes and to pinpoint what problems needed to be solved, as well as suggesting different ways of handling errors and how to improve error handling in general.
+    - AI was used to proofread several sections of code, and to give general feedback. If the feedback was used it has been noted here and in the code. 
+    - AI suggested various formats for AI disclosure within the code.
+
 
 # This information is currently missing and will be added asap by going through chat history
