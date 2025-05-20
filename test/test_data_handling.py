@@ -1,3 +1,6 @@
+# This code was modified using the assistance of AI (ChatGPT) to explain user about the structure of running unit tests
+# See detailed use of AI file for further explanation
+
 import unittest
 import pandas as pd
 from pandas.testing import assert_frame_equal
