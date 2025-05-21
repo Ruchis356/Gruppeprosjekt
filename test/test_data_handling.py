@@ -1,4 +1,4 @@
-# This code was modified using the assistance of AI (ChatGPT) to explain user about the structure of running unit tests
+# This code was modified using the assistance of AI (ChatGPT) 
 # See detailed use of AI file for further explanation
 
 import unittest
