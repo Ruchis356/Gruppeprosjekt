@@ -207,7 +207,7 @@ class AnalysedData:
 #        outliers_df = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in outlier_table.items()]))
 
         # Convert to DataFrame and add dates
-        outliers_df = pd.DataFrame(outlier_table)
+        outliers_df = pd.DataFrame({k: pd.Series(v) for k, v in outlier_table.items()})
         outliers_df[date_column] = df.loc[outliers_df.index, date_column]
         
         # Reorder to put date column first
