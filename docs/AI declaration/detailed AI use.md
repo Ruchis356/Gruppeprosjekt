@@ -74,5 +74,14 @@ General/no file
     - AI was used to proofread several sections of code, and to give general feedback. If the feedback was used it has been noted here and in the code. 
     - AI suggested various formats for AI disclosure within the code.
 
+test_data_handling.py
+
+    - AI was used to teach developer how to write unit tests, explaining the main structure of Arrange Act and Assert. 
+    - AI was used to suggest improvements in the code by suggesting the use of "self.processor" and "self.processor = RefinedData()" code which acted as a gateway to call on all of the funcions inside the data_handling files
+    - AI helped organize the code into a better format and suggested any errors/problems in the code
+    - AI helped suggest a sample test data frame (self.df) as an appropriate data frame that could be used to test all of the funcitons inside data_handling
+    
+
+
 
 
