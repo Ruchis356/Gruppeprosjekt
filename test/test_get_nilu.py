@@ -39,7 +39,7 @@ Tid;Dekning;Dekning.1;Dekning.2;Dekning.3;Dekning.4
         # Assertions:  
         self.assertIsInstance(result, pd.DataFrame)         # Is it a dataframe? 
         self.assertEqual(result.shape[0], 2)                # Is it the expected shape?        
-        self.assertIn('Tid', result.columns)                # Did the function create the date column correctly? 
+        self.assertIn('Date', result.columns)                # Did the function create the date column correctly? 
         self.assertEqual(result['Dekning'].iloc[0], 100)
         self.assertEqual(result['Dekning'].iloc[1], 0)      # Does the function remove the poor quality data as expected?
 
