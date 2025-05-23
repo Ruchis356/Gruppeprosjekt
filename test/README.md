@@ -13,3 +13,11 @@ fill: Replaces missing values with a specified value.
 No missing values: Returns None.
 
 The setUp method uses self to create reusable instance variables: a RefinedData processor and a sample DataFrame with missing values. Using self allows these to be accessed across all test methods, ensuring consistency and reducing code repetition.
+
+
+
+# TESTING STRATEGY NOTE:
+# - `VisualTable.pretty_data()` is intentionally untested because:
+#   1. It is a thin presentation-layer wrapper around pandas/IPython (already stable).
+#   2. Input validity is enforced by earlier pipeline stages (tested elsewhere).
+#   3. Manual verification confirms display behavior in Jupyter/non-Jupyter contexts.
