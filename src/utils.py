@@ -38,24 +38,52 @@ class VisualTable:
         pd.set_option('display.max_columns', None)
         pd.set_option('display.width', None)
 
+        # Formatting numbers to clean up decimals
+        def clean_number(x):
+            if pd.isna(x):
+                return x
+            if isinstance(x, (int, float)):
+                if x == int(x):
+                    return int(x) 
+                
+                rounded = round(x, 2)
+                if rounded == round(x, 1):
+                    return round(x, 1)  
+                return rounded
+            return x 
+
+        # Apply formatting
+        formatted_df = df.copy()
+        numeric_cols = df.select_dtypes(include=['int', 'float']).columns
+        for col in numeric_cols:
+            formatted_df[col] = df[col].apply(clean_number)
+
         if IN_JUPYTER:
-            # Convert DataFrame to HTML and wrap in a scrollable div
-            df_html = df.to_html()
+            # Jupyter display 
+            styler = formatted_df.style.format(
+                na_rep="NaN",
+                subset=numeric_cols,  # Only format numeric cols
+                formatter=lambda x: (
+                    f"{int(x)}" if isinstance(x, float) and x.is_integer()
+                    else f"{x:.2f}".rstrip('0').rstrip('.') 
+                    if f"{x:.2f}".endswith('0') 
+                    else f"{x:.2f}"
+                )
+            )
+            display(HTML(
+                f'<div style="max-height:400px; overflow:auto">'
+                f'{styler.to_html()}'
+                f'</div>'
+            ))
 
-            scrollable_table = f"""
-            <div style="
-                overflow-x: auto; 
-                overflow-y: auto; 
-                max-height: 400px; 
-                max-width: 100%;
-            ">
-                {df_html}
-            </div>
-            """
-
-            # Display the scrollable table
-            display(HTML(scrollable_table))
-
-        # Fall back to standard printing outside Jupyter
         else:
-            print(df)
+            # Fall back to standard printing outside jupyter
+            with pd.option_context(
+                'display.float_format', 
+                lambda x: (
+                    f"{int(x)}" if x == int(x)
+                    else f"{x:.1f}" if f"{x:.2f}"[-1] == '0'
+                    else f"{x:.2f}"
+                )
+            ):
+                print(formatted_df.to_string(na_rep='NaN'))
