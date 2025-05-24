@@ -226,7 +226,7 @@ class RawData:
             )
 
             logger.info(
-                '\nSuccessfully collected and processed %s rows of data from %s\n',
+                '\nSuccessfully collected and processed %s rows of data from \n%s\n',
                 df.shape[0], 
                 file_path
             )
@@ -271,4 +271,96 @@ class RawData:
             return None
         except Exception as e:
             logger.exception("An unexpected error has occured")
+            return None
+
+    # ------------------------------------------
+    # WEATHER FORECAST - IMPORT
+    # ------------------------------------------
+
+    def get_forecast(self, station_id=None, lat=63.419, lon=10.395):
+
+        """
+        Fetches daily weather forecast from MET Norway's Locationforecast API.
+        
+        Args:
+            station_id (str): Optional – if provided, uses its coordinates.
+            lat (float): Latitude (default: Trondheim)
+            lon (float): Longitude (default: Trondheim)
+        
+        Returns:
+            pd.DataFrame | None: Forecast data or None if failed
+        """
+
+        url = f"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={lat}&lon={lon}"
+        headers = {"User-Agent": "myweatherapp/1.0 your_email@example.com"}
+
+
+        try:
+            # If station_id is given, look up its coordinates
+            if station_id:
+                client_id = 'd933f861-70f3-4d0f-adc6-b1edb5978a9e'
+                source_url = f'https://frost.met.no/sources/v0.jsonld?ids={station_id}'
+                response = requests.get(source_url, auth=(client_id, ''))
+                response.raise_for_status()
+                source_data = response.json()
+                lat = source_data['data'][0]['geometry']['coordinates'][1]
+                lon = source_data['data'][0]['geometry']['coordinates'][0]
+
+            # Fetch forecast data (hourly resolution)
+            url = f"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={lat}&lon={lon}"
+            headers = {"User-Agent": "myweatherapp/1.0 your_email@example.com"}
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+
+            # Process into daily aggregates
+            daily_data = {}
+            last_precip_time = None
+
+            for entry in data["properties"]["timeseries"]:
+                time = pd.to_datetime(entry["time"])
+                date_str = time.strftime("%Y-%m-%d")  # Store as string early
+                details = entry["data"]["instant"]["details"]
+
+                if date_str not in daily_data:
+                    daily_data[date_str] = {"temps": [], "precips": [], "winds": []}
+
+                # Always add temperature/wind
+                daily_data[date_str]["temps"].append(details.get("air_temperature"))
+                daily_data[date_str]["winds"].append(details.get("wind_speed"))
+
+                # Handle precipitation (skip overlaps)
+                precip = 0
+                if "next_6_hours" in entry["data"]:
+                    precip_end = time + pd.Timedelta(hours=6)
+                    
+                    # Only add precipitation if this is a new period
+                    if last_precip_time is None or time >= last_precip_time:
+                        precip = entry["data"]["next_6_hours"]["details"].get("precipitation_amount", 0)
+                        last_precip_time = precip_end  # Update tracking
+                elif "next_1_hours" in entry["data"]:
+                    precip = entry["data"]["next_1_hours"]["details"].get("precipitation_amount", 0)
+                    
+                daily_data[date_str]["precips"].append(precip)
+
+            # Convert to daily averages/sums
+            forecast_days = []
+            for date_str, values in daily_data.items():
+                forecast_days.append({
+                    "Date": date_str,  # Already in YYYY-MM-DD format
+                    "temperature (C)": np.nanmean(values["temps"]),
+                    "wind_speed (m/s)": np.nanmean(values["winds"]),
+                    "precipitation (mm)": np.nansum(values["precips"]),
+                })
+
+            df = pd.DataFrame(forecast_days)
+            desired_order = ["Date", "temperature (C)", "wind_speed (m/s)", "precipitation (mm)"]
+            df = df.reindex(columns=[col for col in desired_order if col in df.columns])
+
+            # Only keep future forecasts
+            today_str = pd.Timestamp.now().strftime("%Y-%m-%d")
+            return df[df["Date"] >= today_str] 
+
+        except Exception as e:
+            logger.error(f"Failed to fetch forecast: {e}")
             return None
