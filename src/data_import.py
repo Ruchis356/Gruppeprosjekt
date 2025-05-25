@@ -146,6 +146,12 @@ class RawData:
                     columns='unit',
                     values='value'
                 ).reset_index()
+
+                try:
+                    pivoted_df['referenceTime'] = pd.to_datetime(pivoted_df['referenceTime'])
+                except ValueError as e:
+                    logger.error("Date conversion failed: %s", e)
+                    return None
                 
                 # Clean up column names
                 pivoted_df.columns.name = None
@@ -155,6 +161,8 @@ class RawData:
                     'm/s': 'wind_speed (m/s)',
                     'referenceTime': 'Date'
                 })
+
+                df['Date'] = pd.to_datetime(df['Date'])
 
             logger.info(
                 '\nProcessed DataFrame: %s rows x %s parameters (%.1f%% non-empty values)\n',
@@ -313,11 +321,29 @@ class RawData:
             response.raise_for_status()
             data = response.json()
 
+            '''# Check if the request was succesfull, and exit if not
+            if response.status_code == 200:
+                unique_times = len({obs['referenceTime'] for obs in data})
+                logger.info(
+                    '\nSuccessfully collected %s raw observations (%s unique timestamps) from Frost API\n',
+                    len(data), 
+                    unique_times
+                )
+            else:
+                logger.error(
+                    'API Error %s: %s (Reason: %s)',
+                    response.status_code,
+                    data['error']['message'],
+                    data['error']['reason']
+                )
+                return None'''
+
             # Process into daily aggregates
             daily_data = {}
             last_precip_time = None
 
             for entry in data["properties"]["timeseries"]:
+                #AI-suggested improvement for robust datetime handling (DeepSeek)
                 time = pd.to_datetime(entry["time"])
                 date_str = time.strftime("%Y-%m-%d")  # Store as string early
                 details = entry["data"]["instant"]["details"]

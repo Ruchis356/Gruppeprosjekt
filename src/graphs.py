@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.dates as mdates
+from datetime import datetime, timedelta
 import logging # The use of logging was suggested by AI (DeepSeek)
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -219,3 +220,260 @@ class Graphs:
         plt.tight_layout()
         plt.show(block=False)
         plt.close(fig) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class PredictiveGraphs:
+    '''A class for creating graphs based on predictive analysis.'''
+
+    def __init__(self, figsize=(14, 10)):
+
+        """
+        Initialize with default figure size.
+        
+        Args:
+            figsize: Tuple (width, height) in inches
+        """
+
+        self.figsize = figsize
+        self.style = {
+            'historical': {'color': 'blue', 'marker': 'o', 'alpha': 0.3},
+            'prediction': {'color': 'red', 'linestyle': '-'},
+            'api': {'color': 'green', 'marker': 'o', 's': 80}
+        }
+
+    def _setup_plot(self, rows=1, cols=1, sharex=False):
+        """Helper method to create consistent plot figures."""
+        fig, ax = plt.subplots(rows, cols, figsize=self.figsize, sharex=sharex)
+        if rows == 1 and cols == 1:
+            ax = [ax] 
+        return fig, ax
+
+    def plot_full_overview(self, historical_df, forecast_temp, forecast_precip, forecast_wind, api_df):
+
+        """
+        Plot comprehensive overview of historical data, predictions and API forecast
+
+        Args:
+            historical_df: DataFrame with columns ['Date', 'temperature (C)', ...]
+            forecast_temp: DataFrame with columns ['Date', 'Prediction']
+            forecast_precip: DataFrame with columns ['Date', 'Prediction']
+            forecast_wind: DataFrame with columns ['Date', 'Prediction']
+            api_df: DataFrame with columns ['Date', 'API_Temp', 'API_Precip', 'API_Wind']
+        """
+
+        fig, ax = self._setup_plot(rows=3, sharex=True)
+
+        # Temperature plot
+        self._plot_single_metric(ax[0], historical_df['Date'], 
+                               historical_df['temperature (C)'], 
+                               forecast_temp['Date'], forecast_temp['Prediction'],
+                               api_df['Date'], api_df['API_Temp'],
+                               'Historical temp', 'Predicted temp', 'API temp', 
+                               'Temperature (°C)')
+        
+        # Wind plot
+        self._plot_single_metric(ax[1], historical_df['Date'],
+                               historical_df['wind_speed (m/s)'],
+                               forecast_wind['Date'], forecast_wind['Prediction'],
+                               api_df['Date'], api_df['API_Wind'],
+                               'Historical wind', 'Predicted wind', 'API wind',
+                               'Wind (m/s)')
+
+        # Precipitation plot
+        self._plot_single_metric(ax[2], historical_df['Date'],
+                               historical_df['precipitation (mm)'],
+                               forecast_precip['Date'], forecast_precip['Prediction'],
+                               api_df['Date'], api_df['API_Precip'],
+                               'Historical precip', 'Predicted precip', 'API precip',
+                               'Precipitation (mm)')
+
+        plt.suptitle('Historical, Predicted and API Data: Temperature, Precipitation and Wind')
+        plt.tight_layout()
+        plt.show()
+
+    def _plot_single_metric(self, ax, hist_dates, hist_values, 
+                          pred_dates, pred_values,
+                          api_dates, api_values,
+                          hist_label, pred_label, api_label, ylabel):
+        """Helper method to plot a single metric."""
+        # Historical data
+        ax.scatter(hist_dates, hist_values, 
+                  label=hist_label, **self.style['historical'])
+        
+        # Prediction line
+        ax.plot(pred_dates, pred_values, 
+               label=pred_label, **self.style['prediction'])
+        
+        # API data
+        ax.scatter(api_dates, api_values, 
+                  label=api_label, **self.style['api'])
+        
+        ax.set_ylabel(ylabel)
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
+
+
+
+
+
+
+
+
+
+
+    def plot_week_comparison(self, forecast_temp, forecast_precip, 
+                           forecast_wind, api_df):
+        """
+        Plot 7-day comparison between model predictions and API forecast.
+        
+        Args:
+            forecast_temp: DataFrame with columns ['Date', 'Prediction']
+            forecast_precip: DataFrame with columns ['Date', 'Prediction']
+            forecast_wind: DataFrame with columns ['Date', 'Prediction']
+            api_df: DataFrame with columns ['Date', 'API_Temp', 'API_Precip', 'API_Wind']
+        """
+        # Date range setup
+        today = pd.to_datetime(datetime.now().date())
+        end = today + timedelta(days=7)
+        
+        # Filter data
+        week_data = {
+            'temp': forecast_temp[(forecast_temp['Date'] >= today) & 
+                                (forecast_temp['Date'] <= end)],
+            'wind': forecast_wind[(forecast_wind['Date'] >= today) & 
+                                (forecast_wind['Date'] <= end)],
+            'precip': forecast_precip[(forecast_precip['Date'] >= today) & 
+                                    (forecast_precip['Date'] <= end)],
+            'api': api_df[(api_df['Date'] >= today) & 
+                         (api_df['Date'] <= end)]
+        }
+
+        fig, ax = self._setup_plot(rows=3, sharex=True)
+
+        # Temperature comparison
+        self._plot_comparison(ax[0], week_data['temp']['Date'], 
+                            week_data['temp']['Prediction'],
+                            week_data['api']['Date'], 
+                            week_data['api']['API_Temp'],
+                            'Predicted temp', 'API temp', 
+                            'Temperature (°C)')
+        
+        # Wind comparison
+        self._plot_comparison(ax[1], week_data['wind']['Date'],
+                            week_data['wind']['Prediction'],
+                            week_data['api']['Date'],
+                            week_data['api']['API_Wind'],
+                            'Predicted wind', 'API wind',
+                            'Wind (m/s)')
+
+        # Precipitation comparison
+        self._plot_comparison(ax[2], week_data['precip']['Date'],
+                            week_data['precip']['Prediction'],
+                            week_data['api']['Date'],
+                            week_data['api']['API_Precip'],
+                            'Predicted precip', 'API precip',
+                            'Precipitation (mm)')
+
+        # Format x-axis
+        plt.xticks(week_data['api']['Date'], 
+                  [d.strftime('%a\n%m-%d') for d in week_data['api']['Date']])
+        plt.xlabel('Date')
+        plt.suptitle('7-Day Comparison: Temperature, Precipitation and Wind')
+        plt.tight_layout()
+        plt.show()
+
+    def _plot_comparison(self, ax, pred_dates, pred_values,
+                        api_dates, api_values,
+                        pred_label, api_label, ylabel):
+        """Helper method for comparison plots."""
+        ax.plot(pred_dates, pred_values, f"{self.colors['prediction']}-", 
+               label=pred_label)
+        ax.scatter(api_dates, api_values, color=self.colors['api'], 
+                  s=100, label=api_label)
+        ax.set_ylabel(ylabel)
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
+
+
+
+
+
+
+
+
+
+    def plot_results(self, test_data, target):
+        """
+        Plot pollution prediction results.
+        
+        Args:
+            test_data: DataFrame with columns ['Date', target, 'Prediction']
+            target: Column name for actual values ('PM10' or 'NO2')
+        """
+        fig, ax = self._setup_plot()
+        
+        ax.plot(test_data['Date'], test_data[target], 
+               f"{self.colors['historical']}-", 
+               label='Actual')
+        ax.plot(test_data['Date'], test_data['Prediction'], 
+               f"{self.colors['prediction']}--", 
+               label='Predicted')
+        
+        ax.set_title(f'Pollution Prediction for {target} (2018)')
+        ax.set_ylabel(f'{target} (µg/m³)')
+        ax.legend()
+        ax.grid(alpha=0.3)
+        plt.tight_layout()
+        plt.show()
+
+
+
+
+
+
+
+
+
+def plot_comparison(train_df, test_df, target_var):
+    """Compare model performance on train vs test data"""
+    plt.figure(figsize=(12,6))
+    
+    # Training data
+    plt.scatter(train_df['Date'], train_df[target_var], 
+               color='blue', alpha=0.3, label='Actual (Train)')
+    plt.plot(train_df['Date'], train_df['Prediction'],
+            'b-', label='Predicted (Train)')
+    
+    # Test data
+    plt.scatter(test_df['Date'], test_df[target_var],
+               color='red', alpha=0.3, label='Actual (Test)')
+    plt.plot(test_df['Date'], test_df['Prediction'],
+            'r-', label='Predicted (Test)')
+    
+    plt.legend()
+    plt.title(f'Train/Test Comparison: {target_var}')
+    plt.show()
