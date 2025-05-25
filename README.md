@@ -76,3 +76,13 @@ AI tools were used for the following purposes:
 - Suggestions for specific constructs (e.g., exception handling constructs).
 - Smaller blocks of code that were reworked and integrated into the overall code.
 For more details see the bibliography and AI declaration in the docs folder.
+
+## Logging Format Note  
+For better readability in terminal output, some logs intentionally use `\n` for multi-line formatting.
+This has not been done for errors and process logs, only results and summaries, e.g.:  
+```python
+        self.logger.info(
+            f"\nMerged data shape: {merged.shape}, "
+            f"\nAvailable weather: {available_weather}, "
+            f"\nAvailable pollutants: {available_pollutants}\n"
+        )
