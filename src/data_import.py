@@ -301,8 +301,7 @@ class RawData:
 
         url = f"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={lat}&lon={lon}"
         headers = {"User-Agent": "myweatherapp/1.0 your_email@example.com"}
-
-
+        
         try:
             # If station_id is given, look up its coordinates
             if station_id:
@@ -320,23 +319,6 @@ class RawData:
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             data = response.json()
-
-            '''# Check if the request was succesfull, and exit if not
-            if response.status_code == 200:
-                unique_times = len({obs['referenceTime'] for obs in data})
-                logger.info(
-                    '\nSuccessfully collected %s raw observations (%s unique timestamps) from Frost API\n',
-                    len(data), 
-                    unique_times
-                )
-            else:
-                logger.error(
-                    'API Error %s: %s (Reason: %s)',
-                    response.status_code,
-                    data['error']['message'],
-                    data['error']['reason']
-                )
-                return None'''
 
             # Process into daily aggregates
             daily_data = {}
