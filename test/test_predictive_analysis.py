@@ -7,7 +7,7 @@ import sys, os
 # Legg til stien til modulen som skal testes
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
-from predictive_analysis import  TestWeatherAnalyser # Erstatt med faktisk importsti
+from predictive_analysis import WeatherAnalyser 
 
 class TestLoadAndMergeData(unittest.TestCase):
     def setUp(self):
@@ -98,3 +98,7 @@ class TestLoadAndMergeData(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+
+
