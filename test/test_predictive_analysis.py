@@ -12,7 +12,7 @@ from predictive_analysis import WeatherAnalyser
 class TestLoadAndMergeData(unittest.TestCase):
     def setUp(self):
         """Setter opp testdata som brukes i alle tester"""
-        self.analyser = TestWeatherAnalyser()  # Antar at Analyser er klassen som inneholder load_and_merge_data
+        self.analyser = WeatherAnalyser()  # Antar at Analyser er klassen som inneholder load_and_merge_data
         
         # Oppretter testdata for vær
         dates = pd.date_range(start="2020-01-01", periods=30)
@@ -20,7 +20,7 @@ class TestLoadAndMergeData(unittest.TestCase):
             'Date': dates,
             'temperature (C)': np.random.uniform(-5, 25, 30),
             'precipitation (mm)': np.random.uniform(0, 10, 30),
-            'wind speed (m/s)': np.random.uniform(0, 15, 30)
+            'wind_speed (m/s)': np.random.uniform(0, 15, 30)
         })
         
         # Oppretter testdata for luftkvalitet
@@ -32,7 +32,7 @@ class TestLoadAndMergeData(unittest.TestCase):
         })
         
         # Definerer variabler som brukes i testen
-        self.weather_vars = ['temperature (C)', 'precipitation (mm)', 'wind speed (m/s)']
+        self.weather_vars = ['temperature (C)', 'precipitation (mm)', 'wind_speed (m/s)']
         self.pollutant_vars = ['PM10', 'NO2', 'O3']
 
     def test_load_and_merge_data_basic(self):
