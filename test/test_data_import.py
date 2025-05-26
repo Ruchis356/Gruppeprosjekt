@@ -1,7 +1,7 @@
 
 
 # Test for get_forecast yet
-#This code was created entirely by the use of ChatGPT
+#The code for TestGetForecast code was created entirely by the use of ChatGPT
 # Developer learned the cocnept of mock_response and continued use of self.assertIsInstance and self.assertEqual fucntions. 
 
 import unittest
