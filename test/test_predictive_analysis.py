@@ -108,20 +108,20 @@ class TestWeatherAnalyser(unittest.TestCase):
 
 
 
-        def test_safe_fit(self):
-            """Test model training with NaN values"""
-            X = self.test_data[['temperature (C)', 'wind_speed (m/s)']]
-            y = self.test_data['PM10'].copy()
-            y.iloc[2:4] = np.nan
+    def test_safe_fit(self):
+        """Test model training with NaN values"""
+        X = self.test_data[['temperature (C)', 'wind_speed (m/s)']]
+        y = self.test_data['PM10'].copy()
+        y.iloc[2:4] = np.nan
             
 
-            # AI Declaration: The safe_fit method's NaN handling was suggested by AI (Deepseek)
-            # to make training more robust against missing target values
+        # AI Declaration: The safe_fit method's NaN handling was suggested by AI (Deepseek)
+        # to make training more robust against missing target values
 
-            model = LinearRegression()
-            fitted_model = self.analyser.safe_fit(model, X, y)
-            self.assertTrue(hasattr(fitted_model, 'coef_'))
-            self.assertEqual(len(fitted_model.coef_), 2)
+        model = LinearRegression()
+        fitted_model = self.analyser.safe_fit(model, X, y)
+        self.assertTrue(hasattr(fitted_model, 'coef_'))
+        self.assertEqual(len(fitted_model.coef_), 2)
 
     def test_create_model(self):
         """Test model pipeline creation"""
