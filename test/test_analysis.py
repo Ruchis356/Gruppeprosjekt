@@ -1,3 +1,4 @@
+<<<<<<< Finalizing-unit-tests-and-readme-files
 
 # This code was created and modified using the assistance of AI (ChatGPT) 
 # See detailed use of AI file for further explanation
