@@ -1,3 +1,6 @@
+
+# This code was created and modified using the assistance of AI (ChatGPT) 
+# See detailed use of AI file for further explanation
 import unittest
 import pandas as pd
 import numpy as np
