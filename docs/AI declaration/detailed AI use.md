@@ -89,5 +89,13 @@ test_analysis.py
 - AI was used to check to see if I the code were able to cover all types errors that could be caused by the functions ()
 
 
+test_predicitive_analysis.py
+
+    -AI was used to teach developers proper testing approaches for machine learning models, including how to validate RandomForest predictions and handle edge cases.
+    -AI contributed the mutual information feature selection approach that automatically identifies the most relevant weather features for pollution prediction during testing.
+    -AI suggested the safe_fit() implementation that makes model training more robust by properly handling NaN values in test data.
+
+
+
 
 
