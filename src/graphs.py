@@ -599,7 +599,7 @@ class PredictiveGraphs:
                     label=pollutant)
         
         # Customize the plot
-        plt.title('Air Pollutant Forecast', pad=20, fontsize=16)
+        plt.title('Air Pollutant Forecast based on the weather forecast', pad=20, fontsize=16)
         plt.xlabel('Date', fontsize=12)
         plt.ylabel('Concentration (µg/m³)', fontsize=12)
         
