@@ -1,4 +1,3 @@
-<<<<<<< Finalizing-unit-tests-and-readme-files
 
 # This code was created and modified using the assistance of AI (ChatGPT) 
 # See detailed use of AI file for further explanation
@@ -10,7 +9,9 @@ import pandas as pd
 import numpy as np
 from unittest.mock import patch
 # Add the parent directory to the sys.path
-sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(_file_),'..',"src")))
+import sys
+import os
+sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__),'..',"src")))
 from analysis import AnalysedData 
 
 class TestAverages(unittest.TestCase):
