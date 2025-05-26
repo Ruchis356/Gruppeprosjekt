@@ -1,4 +1,4 @@
-# This code was created using the assistance of AI (ChatGPT) 
+# This code was modified using the assistance of AI (ChatGPT) 
 # See detailed use of AI file for further explanation
 
 import unittest

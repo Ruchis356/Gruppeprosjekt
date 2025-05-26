@@ -12,8 +12,12 @@ fill: Replaces missing values with a specified value.
 
 No missing values: Returns None.
 
-The setUp method uses self to create reusable instance variables: a RefinedData processor and a sample DataFrame with missing values. Using self allows these to be accessed across all test methods, ensuring consistency and reducing code repetition.
+This project provides a simple Python class `RefinedData` for handling missing values in Pandas DataFrames. It includes a unit test suite using Python's `unittest` framework.
 
+- `datahandling.py`: Contains the `RefinedData` class and `missing_data()` method.
+- `test_datahandling.py`: Unit tests to validate all method strategies.
+
+The setUp method uses self to create reusable instance variables: a RefinedData processor and a sample DataFrame with missing values. Using self allows these to be accessed across all test methods, ensuring consistency and reducing code repetition.
 
 
 # TESTING STRATEGY NOTE:
