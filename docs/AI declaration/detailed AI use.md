@@ -81,6 +81,7 @@ test_data_handling.py
     - AI helped organize the code into a better format and suggested any errors/problems in the code
     - AI helped suggest a sample test data frame (self.df) as an appropriate data frame that could be used to test all of the funcitons inside data_handling
 
+
 test_predicitive_analysis.py
 
     -AI was used to teach developers proper testing approaches for machine learning models, including how to validate RandomForest predictions and handle edge cases.
@@ -88,6 +89,14 @@ test_predicitive_analysis.py
     -AI suggested the safe_fit() implementation that makes model training more robust by properly handling NaN values in test data.
 
 
+
+    
+test_analysis.py
+
+- AI suggested the use of Error handling and assertions like assertIsInstance, assertAlmostEqual, and assertRaises to validate behaviour of the functions
+- AI was used to fix any error codes during the unit tests 
+- AI was used to write code for total_average and standard_deviation entirely, due to challenging factor of testing the function
+- AI was used to check to see if I the code were able to cover all types errors that could be caused by the functions ()
 
 
 
