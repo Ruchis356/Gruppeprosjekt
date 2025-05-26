@@ -1,3 +1,17 @@
+
+
+
+
+
+# Add a way to remove the 00:00:00 from the dates before printing
+
+
+
+
+
+
+
+
 import pandas as pd
 
 # Importing the display-function for a jupyter file in a conditional manner
