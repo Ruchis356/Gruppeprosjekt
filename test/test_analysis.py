@@ -21,7 +21,7 @@ class TestAverages(unittest.TestCase):
     def test_valid_data_returns_weekly_averages(self):
         df = pd.DataFrame({
             'date': pd.date_range('2023-01-01', periods=14, freq='D'),
-            'A': [1, 2, 3, 4, 5, 6, 7, np.nan, 9, 10, 11, 12, 13, 14]
+            'A': [1, 2, 3, 4, 5, 6, 7, np.nan, 9, 10, 11, 12, 13]
         })
         result = self.processor.averages(df, ['A'])
 
