@@ -2,14 +2,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.dates as mdates
-from datetime import datetime, timedelta
+from sklearn.metrics import r2_score, mean_squared_error 
 import logging # The use of logging was suggested by AI (DeepSeek)
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
-
+ 
 class Graphs:
     """A class for creating visual representation of data in the form of graphs based on dataframes"""
 
@@ -89,7 +89,7 @@ class Graphs:
         plt.close()       
 
     # ---------------------------------------------------
-    # CREATE COMPARATIVE GRAPH OF DATA AND PREDICTOR
+    # CREATE COMPARATIVE GRAPH OF PREDICTOR VS VARIABLES
     # ---------------------------------------------------
 
     # This function was refined with the assitance of AI
@@ -244,6 +244,30 @@ class Graphs:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class PredictiveGraphs:
     '''A class for creating graphs based on predictive analysis.'''
 
@@ -258,106 +282,146 @@ class PredictiveGraphs:
 
         self.figsize = figsize
         self.style = {
-            'historical': {'color': 'blue', 'marker': 'o', 'alpha': 0.3},
-            'prediction': {'color': 'red', 'linestyle': '-'},
-            'api': {'color': 'green', 'marker': 'o', 's': 80}
+            'temperature': {
+                'historical': {"color": "#FF6B6B", "marker": "o", "alpha": 0.3, "s": 30},
+                'prediction': {"color": "#e2a900", "linestyle": "-", "linewidth": 2},
+                'api': {"color": "#C50E0E", "marker": "o", "s": 60}
+            },
+            'wind': {
+                'historical': {"color": "skyblue", "marker": "o", "alpha": 0.3, "s": 30},
+                'prediction': {"color": "#a461f0", "linestyle": "-", "linewidth": 2},
+                'api': {"color": "#366ae5", "marker": "o", "s": 60}
+            },
+            'precipitation': {
+                'historical': {"color": "#6BBBAE", "marker": "o", "alpha": 0.3, "s": 30},
+                'prediction': {"color": "#69d2f8", "linestyle": "-", "linewidth": 2},
+                'api': {"color": "#0c82c2", "marker": "o", "s": 60}
+            },
+            'pollution': {
+                'historical': {"color": "#dc7d00", "marker": "o", "alpha": 0.6},
+                'prediction': {"color": "#000000", "linestyle": "-", "linewidth": 1.5, "alpha": 0.8},
+
+                'train_actual': {"color": "#d065c0", "marker": "o", "alpha": 0.6},
+                'train_pred': {"color": "#140247", "linestyle": "-", "linewidth": 1.5, "alpha": 0.7},
+                'test_actual': {"color": "#b474e4", "marker": "o", "alpha": 0.6},
+                'test_pred': {"color": "#34099f", "linestyle": "-", "linewidth": 1.5, "alpha": 0.7}
+            }
         }
+        
 
     def _setup_plot(self, rows=1, cols=1, sharex=False):
         """Helper method to create consistent plot figures."""
         fig, ax = plt.subplots(rows, cols, figsize=self.figsize, sharex=sharex)
+ 
         if rows == 1 and cols == 1:
-            ax = [ax] 
-        return fig, ax
+            return fig, ax  
+        elif rows == 1 or cols == 1:
+            return fig, ax.flatten().tolist() 
+        else:
+            return fig, ax.ravel().tolist()  
 
     def plot_full_overview(self, historical_df, forecast_temp, forecast_precip, forecast_wind, api_df):
 
         """
-        Plot comprehensive overview of historical data, predictions and API forecast
+        Plot comprehensive overview of historical data, predictions and forecast
 
         Args:
-            historical_df: DataFrame with columns ['Date', 'temperature (C)', ...]
+            historical_df: DataFrame with columns ['Date', 'temperature (C)', 'wind_speed (m/s)', 'precipitation (mm)']
             forecast_temp: DataFrame with columns ['Date', 'Prediction']
             forecast_precip: DataFrame with columns ['Date', 'Prediction']
             forecast_wind: DataFrame with columns ['Date', 'Prediction']
-            api_df: DataFrame with columns ['Date', 'API_Temp', 'API_Precip', 'API_Wind']
+            api_df: DataFrame with columns ['Date', 'temperature (C)', 'wind_speed (m/s)', 'precipitation (mm)']
         """
 
         fig, ax = self._setup_plot(rows=3, sharex=True)
 
-        # Temperature plot
-        self._plot_single_metric(ax[0], historical_df['Date'], 
-                               historical_df['temperature (C)'], 
-                               forecast_temp['Date'], forecast_temp['Prediction'],
-                               api_df['Date'], api_df['API_Temp'],
-                               'Historical temp', 'Predicted temp', 'API temp', 
-                               'Temperature (°C)')
+        # Temperature Plot
+        self._plot_single_metric(
+            ax[0],
+            historical_df['Date'], historical_df['temperature (C)'],
+            forecast_temp['Date'], forecast_temp['Prediction'],
+            api_df['Date'], api_df['temperature (C)'],
+            'Historical temp', 'Predicted temp', 'Forecast temp',
+            'Temperature (°C)',
+            'temperature'  # metric_type
+        )
         
-        # Wind plot
-        self._plot_single_metric(ax[1], historical_df['Date'],
-                               historical_df['wind_speed (m/s)'],
-                               forecast_wind['Date'], forecast_wind['Prediction'],
-                               api_df['Date'], api_df['API_Wind'],
-                               'Historical wind', 'Predicted wind', 'API wind',
-                               'Wind (m/s)')
+        # Wind Plot (similar structure)
+        self._plot_single_metric(
+            ax[1],
+            historical_df['Date'], historical_df['wind_speed (m/s)'],
+            forecast_wind['Date'], forecast_wind['Prediction'],
+            api_df['Date'], api_df['wind_speed (m/s)'],
+            'Historical wind', 'Predicted wind', 'Forecast wind',
+            'Wind (m/s)',
+            'wind'
+        )
+        
+        # Precipitation Plot
+        self._plot_single_metric(
+            ax[2],
+            historical_df['Date'], historical_df['precipitation (mm)'],
+            forecast_precip['Date'], forecast_precip['Prediction'],
+            api_df['Date'], api_df['precipitation (mm)'],
+            'Historical precip', 'Predicted precip', 'Forecast precip',
+            'Precipitation (mm)',
+            'precipitation'
+        )
+        
+        # Add vertical line for training period end
+        for a in ax:
+            a.axvline(x=historical_df['Date'].max(), color='gray', linestyle='--', alpha=0.3)
 
-        # Precipitation plot
-        self._plot_single_metric(ax[2], historical_df['Date'],
-                               historical_df['precipitation (mm)'],
-                               forecast_precip['Date'], forecast_precip['Prediction'],
-                               api_df['Date'], api_df['API_Precip'],
-                               'Historical precip', 'Predicted precip', 'API precip',
-                               'Precipitation (mm)')
-
-        plt.suptitle('Historical, Predicted and API Data: Temperature, Precipitation and Wind')
+        plt.suptitle('Historical, Predicted and Forecast Data: Temperature, Precipitation and Wind')
         plt.tight_layout()
         plt.show()
 
     def _plot_single_metric(self, ax, hist_dates, hist_values, 
                           pred_dates, pred_values,
                           api_dates, api_values,
-                          hist_label, pred_label, api_label, ylabel):
+                          hist_label, pred_label, api_label,
+                          ylabel, metric_type):
         """Helper method to plot a single metric."""
+
+        style = self.style[metric_type]
+
         # Historical data
         ax.scatter(hist_dates, hist_values, 
-                  label=hist_label, **self.style['historical'])
+                label=hist_label, **style['historical'])
         
         # Prediction line
         ax.plot(pred_dates, pred_values, 
-               label=pred_label, **self.style['prediction'])
+            label=pred_label, **style['prediction'])
         
-        # API data
+        # Forecast
         ax.scatter(api_dates, api_values, 
-                  label=api_label, **self.style['api'])
+                label=api_label, **style['api'])
         
         ax.set_ylabel(ylabel)
         ax.legend()
         ax.grid(True, alpha=0.3)
 
-
-
-
-
-
-
-
-
-
-
     def plot_week_comparison(self, forecast_temp, forecast_precip, 
                            forecast_wind, api_df):
         """
-        Plot 7-day comparison between model predictions and API forecast.
+        Plot 7-day comparison between model predictions and Forecast weather.
         
         Args:
             forecast_temp: DataFrame with columns ['Date', 'Prediction']
             forecast_precip: DataFrame with columns ['Date', 'Prediction']
             forecast_wind: DataFrame with columns ['Date', 'Prediction']
-            api_df: DataFrame with columns ['Date', 'API_Temp', 'API_Precip', 'API_Wind']
+            api_df: DataFrame with columns ['Date', 'temperature (C)', 'wind_speed (m/s)', 'precipitation (mm)']
         """
-        # Date range setup
-        today = pd.to_datetime(datetime.now().date())
-        end = today + timedelta(days=7)
+
+        # Convert all date columns first
+        forecast_temp['Date'] = pd.to_datetime(forecast_temp['Date'])
+        forecast_precip['Date'] = pd.to_datetime(forecast_precip['Date'])
+        forecast_wind['Date'] = pd.to_datetime(forecast_wind['Date'])
+        api_df['Date'] = pd.to_datetime(api_df['Date'])
+
+        api_dates = api_df['Date']
+        today = api_dates.min()
+        end = api_dates.max()
         
         # Filter data
         week_data = {
@@ -367,35 +431,43 @@ class PredictiveGraphs:
                                 (forecast_wind['Date'] <= end)],
             'precip': forecast_precip[(forecast_precip['Date'] >= today) & 
                                     (forecast_precip['Date'] <= end)],
-            'api': api_df[(api_df['Date'] >= today) & 
-                         (api_df['Date'] <= end)]
+            'api': api_df
         }
 
-        fig, ax = self._setup_plot(rows=3, sharex=True)
+        fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(14, 12), sharex=True)
 
         # Temperature comparison
-        self._plot_comparison(ax[0], week_data['temp']['Date'], 
-                            week_data['temp']['Prediction'],
-                            week_data['api']['Date'], 
-                            week_data['api']['API_Temp'],
-                            'Predicted temp', 'API temp', 
-                            'Temperature (°C)')
-        
+        if not week_data['temp'].empty:
+            self._plot_comparison(ax1, week_data['temp']['Date'], 
+                                week_data['temp']['Prediction'],
+                                week_data['api']['Date'], 
+                                week_data['api']['temperature (C)'],
+                                'Predicted temp', 'Forecast temp', 
+                                'Temperature (°C)', 'temperature')
+        else:
+            ax1.text(0.5, 0.5, 'No forecast data available', ha='center')
+            
         # Wind comparison
-        self._plot_comparison(ax[1], week_data['wind']['Date'],
-                            week_data['wind']['Prediction'],
-                            week_data['api']['Date'],
-                            week_data['api']['API_Wind'],
-                            'Predicted wind', 'API wind',
-                            'Wind (m/s)')
+        if not week_data['wind'].empty:
+            self._plot_comparison(ax2, week_data['wind']['Date'],
+                                week_data['wind']['Prediction'],
+                                week_data['api']['Date'],
+                                week_data['api']['wind_speed (m/s)'],
+                                'Predicted wind', 'Forecast wind',
+                                'Wind (m/s)', 'wind')
+        else:
+            ax2.text(0.5, 0.5, 'No forecast data available', ha='center')
 
         # Precipitation comparison
-        self._plot_comparison(ax[2], week_data['precip']['Date'],
-                            week_data['precip']['Prediction'],
-                            week_data['api']['Date'],
-                            week_data['api']['API_Precip'],
-                            'Predicted precip', 'API precip',
-                            'Precipitation (mm)')
+        if not week_data['precip'].empty:
+            self._plot_comparison(ax3, week_data['precip']['Date'],
+                                week_data['precip']['Prediction'],
+                                week_data['api']['Date'],
+                                week_data['api']['precipitation (mm)'],
+                                'Predicted precip', 'Forecast precip',
+                                'Precipitation (mm)', 'precipitation')
+        else:
+            ax3.text(0.5, 0.5, 'No forecast data available', ha='center')
 
         # Format x-axis
         plt.xticks(week_data['api']['Date'], 
@@ -407,24 +479,19 @@ class PredictiveGraphs:
 
     def _plot_comparison(self, ax, pred_dates, pred_values,
                         api_dates, api_values,
-                        pred_label, api_label, ylabel):
+                        pred_label, api_label, ylabel, metric_type):
         """Helper method for comparison plots."""
-        ax.plot(pred_dates, pred_values, f"{self.colors['prediction']}-", 
-               label=pred_label)
-        ax.scatter(api_dates, api_values, color=self.colors['api'], 
-                  s=100, label=api_label)
+
+        style = self.style[metric_type]
+
+        ax.plot(pred_dates, pred_values, 
+            label=pred_label, **style['prediction'])
+        ax.scatter(api_dates, api_values, 
+                label=api_label, **style['api'])
+        
         ax.set_ylabel(ylabel)
         ax.legend()
         ax.grid(True, alpha=0.3)
-
-
-
-
-
-
-
-
-
 
     def plot_results(self, test_data, target):
         """
@@ -432,21 +499,226 @@ class PredictiveGraphs:
         
         Args:
             test_data: DataFrame with columns ['Date', target, 'Prediction']
-            target: Column name for actual values ('PM10' or 'NO2')
+            target: Column name for actual values (eg. 'PM10' or 'NO2')
         """
-        fig, ax = self._setup_plot()
+        fig, ax = plt.subplots(figsize=self.figsize)
+
+        style = self.style['pollution']
+
+        # Plot ctual values
+        ax.scatter(test_data['Date'], test_data[target],
+                label='Actual', **style['historical'])
         
-        ax.plot(test_data['Date'], test_data[target], 
-               f"{self.colors['historical']}-", 
-               label='Actual')
-        ax.plot(test_data['Date'], test_data['Prediction'], 
-               f"{self.colors['prediction']}--", 
-               label='Predicted')
+        if isinstance(ax, list):
+            ax = ax[0]
+
+        # Only connect consecutive points
+#        valid_mask = test_data[target].notna()
+ #       ax.plot(test_data['Date'][valid_mask], test_data[target][valid_mask],
+  #      **style['historical'], 
+   #     linestyle='--')
         
-        ax.set_title(f'Pollution Prediction for {target} (2018)')
+        # Prediction line
+        ax.plot(test_data['Date'], test_data['Prediction'],
+            label='Predicted', **style['prediction'])
+        
+        ax.set_title(f'Pollution Prediction for {target}')
         ax.set_ylabel(f'{target} (µg/m³)')
         ax.legend()
         ax.grid(alpha=0.3)
+        plt.tight_layout()
+        plt.show()
+
+    def plot_comparison(self, train_df, test_df, target_var):
+        """Compare model performance on train vs test data"""
+
+        # Check required columns exist
+        for df, name in [(train_df, 'train_df'), (test_df, 'test_df')]:
+            required = ['Date', target_var, 'Prediction']
+            missing = [col for col in required if col not in df.columns]
+            if missing:
+                raise ValueError(f"Missing columns in {name}: {missing}. Available: {df.columns}")
+
+        plt.figure(figsize=(12,6))
+
+        style = self.style['pollution']
+        
+        # Trim predictions to actual data ranges
+        train_mask = train_df[target_var].notna()
+        test_mask = test_df[target_var].notna()
+
+        # Plot training data
+        plt.scatter(train_df['Date'][train_mask], 
+                train_df[target_var][train_mask],
+                **style['train_actual'],
+                label='Actual (Train)')
+        
+        plt.plot(train_df['Date'][train_mask],
+                train_df['Prediction'][train_mask],
+                **style['train_pred'],
+                label='Predicted (Train)')
+        
+        # Plot test data
+        plt.scatter(test_df['Date'][test_mask],
+                test_df[target_var][test_mask],
+                **style['test_actual'],
+                label='Actual (Test)')
+    
+        plt.plot(test_df['Date'][test_mask],
+                test_df['Prediction'][test_mask],
+                **style['test_pred'],
+                label='Predicted (Test)')
+        
+        plt.legend()
+        plt.title(f'Train/Test Comparison: {target_var}')
+        plt.show()
+
+    def plot_pollutant_forecasts(self, forecasts, pollutants=None):
+        """Plot all pollutant forecasts in one graph with different colors"""
+        if pollutants is None:
+            pollutants = ['NO', 'NO2', 'PM2.5', 'PM10']  # Default to these four
+        
+        plt.figure(figsize=(14, 8))
+        
+        # Color palette - using ColorBrewer qualitative Set1
+        colors = ["#a058ec", "#63b0ef", '#4daf4a', '#984ea3']  # Red, Blue, Green, Purple
+        
+        # Create normalized y-axis for better comparison
+        norm = plt.Normalize(0, len(pollutants))
+        
+        for i, pollutant in enumerate(pollutants):
+            forecast_df = forecasts[pollutant]
+            
+            # Plot with unique color and offset for clarity
+            plt.plot(forecast_df['Date'], 
+                    forecast_df[f'{pollutant}_forecast'] + i*0.1,  # Small vertical offset
+                    color=colors[i],
+                    linewidth=2,
+                    marker='o',
+                    markersize=8,
+                    label=pollutant)
+        
+        # Customize the plot
+        plt.title('Air Pollutant Forecast based on the weather forecast', pad=20, fontsize=16)
+        plt.xlabel('Date', fontsize=12)
+        plt.ylabel('Concentration (µg/m³)', fontsize=12)
+        
+        # Custom legend showing actual pollutant names
+        legend = plt.legend(title='Pollutants', 
+                        framealpha=0.9,
+                        edgecolor='black')
+        legend.get_title().set_fontsize(12)
+        
+        # Format x-axis
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%a %d-%m'))
+        plt.gca().xaxis.set_major_locator(mdates.DayLocator())
+        
+        # Add grid and styling
+        plt.grid(True, alpha=0.3, linestyle='--')
+        plt.tight_layout()
+        plt.show()
+
+
+
+    def model_information(self, model, merged_data, weather_vars, target, features):
+        """
+        Display model diagnostics with NaN handling
+        
+        Args:
+            model: Trained model object
+            merged_data: DataFrame containing features and target
+            weather_vars: List of 3 weather variables [temp, wind, precip]
+            target: Target pollutant name (e.g., 'NO2')
+            features: List of features used in the model
+        """
+        # Create clean copy of data
+        analysis_data = merged_data.copy()
+        
+        # --- NaN Handling ---
+        # 1. For feature plots, drop rows where specific vars are NaN
+        plot_data = analysis_data.dropna(subset=weather_vars + [target], how='any')
+        
+        # 2. For model evaluation, drop rows where ANY feature or target is NaN
+        eval_data = analysis_data.dropna(subset=features + [target], how='any')
+        
+        # --- Set up figure ---
+        fig = plt.figure(figsize=(18, 12))
+        gs = fig.add_gridspec(3, 3)
+        
+        # --- Plot 1-3: Feature Relationships ---
+        # Temperature vs Target
+        ax1 = fig.add_subplot(gs[0, 0])
+        if not plot_data.empty:
+            plot_data.plot.scatter(x=weather_vars[0], y=target, ax=ax1, alpha=0.3, color='#e41a1c')
+        ax1.set_title(f'{target} vs {weather_vars[0]}')
+        
+        # Wind vs Target
+        ax2 = fig.add_subplot(gs[0, 1])
+        if not plot_data.empty:
+            plot_data.plot.scatter(x=weather_vars[1], y=target, ax=ax2, alpha=0.3, color='#377eb8')
+        ax2.set_title(f'{target} vs {weather_vars[1]}')
+        
+        # Monthly Pattern
+        ax3 = fig.add_subplot(gs[0, 2])
+        if not analysis_data.empty:
+            monthly_data = analysis_data.groupby(analysis_data['Date'].dt.month)[target].mean()
+            if not monthly_data.empty:
+                monthly_data.plot(
+                    ax=ax3, color='#4daf4a', marker='o', linestyle='--',
+                    title=f'Monthly {target} Pattern'
+                )
+                ax3.set_xticks(range(1,13))
+                ax3.set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'])
+        ax3.set_xlabel('Month')
+        
+        # --- Plot 4: Feature Importance ---
+        ax4 = fig.add_subplot(gs[1, :])
+        if hasattr(model, 'feature_importances_'):
+            importance = pd.Series(model.feature_importances_, index=features)
+            importance.sort_values().plot.barh(ax=ax4, color='#984ea3')
+            ax4.set_title('Feature Importance')
+        else:
+            ax4.text(0.5, 0.5, 'Feature importance not available', ha='center', va='center')
+            ax4.set_axis_off()
+        
+        # --- Model Evaluation Plots (only if we have clean data) ---
+        if not eval_data.empty:
+            try:
+                predictions = model.predict(eval_data[features])
+                
+                # Actual vs Predicted
+                ax5 = fig.add_subplot(gs[2, 0])
+                ax5.scatter(eval_data[target], predictions, alpha=0.3, color='#ff7f00')
+                ax5.plot([eval_data[target].min(), eval_data[target].max()],
+                        [eval_data[target].min(), eval_data[target].max()], 'r--')
+                ax5.set_title('Actual vs Predicted')
+                
+                # Residuals
+                ax6 = fig.add_subplot(gs[2, 1])
+                residuals = eval_data[target] - predictions
+                ax6.scatter(predictions, residuals, alpha=0.3, color='#a65628')
+                ax6.axhline(y=0, color='r', linestyle='-')
+                ax6.set_title('Residual Plot')
+                
+                # Metrics
+                ax7 = fig.add_subplot(gs[2, 2])
+                r2 = r2_score(eval_data[target], predictions)
+                mse = mean_squared_error(eval_data[target], predictions)
+                ax7.text(0.5, 0.5, 
+                        f"R² = {r2:.3f}\nMSE = {mse:.3f}\nSamples = {len(eval_data)}",
+                        ha='center', va='center')
+                
+            except Exception as e:
+                for ax in [ax5, ax6, ax7]:
+                    ax.text(0.5, 0.5, f"Evaluation failed:\n{str(e)}", 
+                        ha='center', va='center')
+                    ax.set_axis_off()
+        else:
+            for ax in [ax5, ax6, ax7]:
+                ax.text(0.5, 0.5, "Insufficient clean data for evaluation", 
+                    ha='center', va='center')
+                ax.set_axis_off()
+        
         plt.tight_layout()
         plt.show()
 
@@ -458,22 +730,79 @@ class PredictiveGraphs:
 
 
 
-def plot_comparison(train_df, test_df, target_var):
-    """Compare model performance on train vs test data"""
-    plt.figure(figsize=(12,6))
-    
-    # Training data
-    plt.scatter(train_df['Date'], train_df[target_var], 
-               color='blue', alpha=0.3, label='Actual (Train)')
-    plt.plot(train_df['Date'], train_df['Prediction'],
-            'b-', label='Predicted (Train)')
-    
-    # Test data
-    plt.scatter(test_df['Date'], test_df[target_var],
-               color='red', alpha=0.3, label='Actual (Test)')
-    plt.plot(test_df['Date'], test_df['Prediction'],
-            'r-', label='Predicted (Test)')
-    
-    plt.legend()
-    plt.title(f'Train/Test Comparison: {target_var}')
-    plt.show()
+
+
+
+
+
+
+        '''x1, x2, x3 = weather_vars
+
+
+
+        fig, ax = plt.subplots(1, 3, figsize=(15,4))
+
+        # Plot 1: Temperature vs NO2
+        merged_data.plot.scatter(x=x1, y=target, ax=ax[0], alpha=0.3)
+
+        # Plot 2: Wind speed vs NO2
+        merged_data.plot.scatter(x=x2, y=target, ax=ax[1], alpha=0.3)
+
+        # Plot 3: Monthly pattern (fixed version)
+        monthly_no2 = merged_data.groupby(merged_data['Date'].dt.month)[target].mean()
+        monthly_no2.plot(
+            ax=ax[2],
+            title='Monthly {target} Pattern',
+            xticks=range(1,13),
+            color='green',
+            marker='o',
+            linestyle='--'
+        )
+        ax[2].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'])
+        ax[2].set_xlabel('Month')
+
+        plt.tight_layout()
+        plt.show()'''
+
+        '''try:
+            (pd.Series(rf.feature_importances_, index=NO2_FEATURES)
+            .sort_values()
+            .plot.barh(title="Feature Importance (Clean Data)"))
+            plt.show()
+        except Exception as e:
+            print(f"Visualization failed: {str(e)}")
+            print("Raw importance values:", dict(zip(NO2_FEATURES, rf.feature_importances_)))
+
+        # Plot actual vs predicted
+        plt.figure(figsize=(10,4))
+        plt.scatter(test_data[target], predictions, alpha=0.3)
+        plt.plot([min(test_data[target]), max(test_data[target])], 
+                [min(test_data[target]), max(test_data[target])], 
+                'r--')
+        plt.title(f"{target} Actual vs Predicted")
+        plt.show()
+        
+        # Feature importance
+        if hasattr(model, 'feature_importances_'):
+            pd.Series(model.feature_importances_, index=features)\
+              .sort_values()\
+              .plot.barh(title=f"{target} Feature Importance")
+            plt.show()'''
+
+
+        '''residuals = valid_data[target] - predictions
+        plt.figure(figsize=(10,4))
+        plt.scatter(predictions, residuals, alpha=0.3)
+        plt.axhline(y=0, color='r', linestyle='-')
+        plt.title("Residual Plot")
+        plt.xlabel("Predicted Values")
+        plt.ylabel("Residuals")
+        plt.show()
+
+        if hasattr(model, 'feature_importances_'):
+            plt.figure(figsize=(10,6))
+            pd.Series(model.feature_importances_, index=features)\
+            .sort_values()\
+            .plot.barh(title="Feature Importance")
+            plt.show()'''
+
