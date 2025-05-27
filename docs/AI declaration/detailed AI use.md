@@ -135,6 +135,19 @@ test_data_handling.py
     - AI was used to suggest improvements in the code by suggesting the use of "self.processor" and "self.processor = RefinedData()" code which acted as a gateway to call on all of the funcions inside the data_handling files
     - AI helped organize the code into a better format and suggested any errors/problems in the code
     - AI helped suggest a sample test data frame (self.df) as an appropriate data frame that could be used to test all of the funcitons inside data_handling
+
+
+
+
+test_predicitive_analysis.py
+
+    -AI was used to teach developers proper testing approaches for machine learning models, including how to validate RandomForest predictions and handle edge cases.
+    -AI contributed the mutual information feature selection approach that automatically identifies the most relevant weather features for pollution prediction during testing.
+    -AI suggested the safe_fit() implementation that makes model training more robust by properly handling NaN values in test data.
+
+
+
+
 test_analysis.py
     - AI suggested the use of Error handling and assertions like assertIsInstance, assertAlmostEqual, and assertRaises to validate behaviour of the functions
     - AI was used to fix any error codes during the unit tests 

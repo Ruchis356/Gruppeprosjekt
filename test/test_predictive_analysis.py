@@ -4,11 +4,13 @@
 import unittest
 import pandas as pd
 import numpy as np
+
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression
 import sys
 import os
+
 from unittest.mock import MagicMock
 
 # Mock tqdm before importing predictive_analysis
@@ -16,11 +18,13 @@ sys.modules['tqdm'] = MagicMock()
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
+
 from predictive_analysis import WeatherAnalyser
 
 class TestWeatherAnalyser(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+
         """Test data setup that works with existing predictive_analysis.py"""
         cls.analyser = WeatherAnalyser()
         
@@ -43,10 +47,12 @@ class TestWeatherAnalyser(unittest.TestCase):
         cls.days_to_predict = 5
         
         # Create test data with show_info=False
+
         cls.test_data = cls.analyser.load_and_merge_data(
             cls.df_weather, 
             cls.df_quality,
             ['temperature (C)', 'wind_speed (m/s)', 'precipitation (mm)'],
+
             ['PM10', 'NO2'],
             show_info=False
         )
@@ -142,10 +148,12 @@ class TestWeatherAnalyser(unittest.TestCase):
         # to automatically find relevant features
 
         model = self.analyser.train_model(
+
             self.test_data,
             'PM10',
             features=['temperature (C)', 'wind_speed (m/s)']
         )
+
         self.assertIsInstance(model, RandomForestRegressor)
         
         # Test with invalid target
@@ -209,6 +217,7 @@ class TestWeatherAnalyser(unittest.TestCase):
         
         # Test invalid target
         with self.assertRaises(ValueError):
+
             self.analyser.evaluate_model(
                 self.model,
                 self.test_data,
@@ -216,5 +225,7 @@ class TestWeatherAnalyser(unittest.TestCase):
             )
 
 if __name__ == '__main__':
+
     # Add verbosity=2 to see all test names and results
     unittest.main(verbosity=2)
+
