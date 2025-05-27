@@ -65,7 +65,7 @@ class AnalysedData:
         
         # Ensure date column is datetime type
         try:
-            df_date = pd.to_datetime(df[date_column])
+            df_date = pd.to_datetime(df[date_column], format='%Y-%m-%d')
         except Exception as e:
             logger.error("Could not parse date column: %s", str(e))
             return None
@@ -77,7 +77,8 @@ class AnalysedData:
         # Calculating weekly averages for each column
         try:
             df = df.copy()
-            df['week_group'] = df_date.dt.to_period('W')
+            df['days_since_start'] = (df_date - df_date.min()).dt.days
+            df['week_group'] = df['days_since_start'] // 7  
             
             weekly_avg = (
                 df[valid_columns]
