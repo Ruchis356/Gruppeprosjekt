@@ -26,7 +26,7 @@ class RawData:
     # ------------------------------------------
 
     #Fetch weather data from the Frost API 
-    def get_met(self, station_id, elements, time_range, resolution):
+    def get_met(self, station_id, elements, time_range, resolution, show_info=False):
 
         """
         Fetch weather data from the Frost API.
@@ -95,11 +95,13 @@ class RawData:
             if response.status_code == 200:
                 data = json_data['data']
                 unique_times = len({obs['referenceTime'] for obs in data})
-                logger.info(
-                    '\nSuccessfully collected %s raw observations (%s unique timestamps) from Frost API\n',
-                    len(data), 
-                    unique_times
-                )
+
+                if show_info:
+                    logger.info(
+                        '\nSuccessfully collected %s raw observations (%s unique timestamps) from Frost API\n',
+                        len(data), 
+                        unique_times
+                    )
             else:
                 logger.error(
                     'API Error %s: %s (Reason: %s)',
@@ -164,12 +166,13 @@ class RawData:
 
                 df['Date'] = pd.to_datetime(df['Date'])
 
-            logger.info(
-                '\nProcessed DataFrame: %s rows x %s parameters (%.1f%% non-empty values)\n',
-                df.shape[0],
-                df.shape[1] - 1, #Ignoring date column
-                100 * df.iloc[:, 1:].notna().mean().mean() 
-            )
+            if show_info:
+                logger.info(
+                    '\nProcessed DataFrame: %s rows x %s parameters (%.1f%% non-empty values)\n',
+                    df.shape[0],
+                    df.shape[1] - 1, #Ignoring date column
+                    100 * df.iloc[:, 1:].notna().mean().mean() 
+                )
 
             # Returns pd.DataFrame upon request
             return df 
@@ -200,7 +203,7 @@ class RawData:
     # ------------------------------------------
 
     # Fetch air quality data by Nilu from a CSV file
-    def get_nilu(self, threshold, file_path): 
+    def get_nilu(self, threshold, file_path, show_info=False): 
 
         """
         Fetch air quality data from a CSV file in the data directory.
@@ -233,11 +236,12 @@ class RawData:
                     if col != 'Tid'}  # Pre-specify dtypes
             )
 
-            logger.info(
-                '\nSuccessfully collected and processed %s rows of data from \n%s\n',
-                df.shape[0], 
-                file_path
-            )
+            if show_info:
+                logger.info(
+                    '\nSuccessfully collected and processed %s rows of data from \n%s\n',
+                    df.shape[0], 
+                    file_path
+                )
       
             # The following two blocks are an improvement made based on a suggestion from AI
                 # Purpose: Entirely replace a function in 'data_handling' that dealt with coverage by utilising and removing the overage columns within this function
@@ -255,13 +259,14 @@ class RawData:
             df = df.rename(columns=new_cols)
 
             self.df = df
-
-            logger.info(
-                '\nProcessed DataFrame: %s rows x %s parameters (%.1f%% non-empty values)\n',
-                df.shape[0],
-                df.shape[1] - 1, #Ignoring date column
-                100 * df.iloc[:, 1:].notna().mean().mean() 
-            )
+            
+            if show_info:
+                logger.info(
+                    '\nProcessed DataFrame: %s rows x %s parameters (%.1f%% non-empty values)\n',
+                    df.shape[0],
+                    df.shape[1] - 1, #Ignoring date column
+                    100 * df.iloc[:, 1:].notna().mean().mean() 
+                )
             
             # Returns pd.DataFrame
             return df
