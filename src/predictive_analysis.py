@@ -53,6 +53,7 @@ class WeatherAnalyser:
         
         return df
 
+
     def load_and_merge_data(self, df_weather, df_quality, weather_vars, pollutant_vars, show_info, mode='train'):
         
         """

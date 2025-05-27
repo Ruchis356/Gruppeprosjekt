@@ -150,7 +150,10 @@ class RawData:
 
             if not df.empty:
                 # Check rows for duplicate/multiple values and only keeping one
-                df = df.drop_duplicates(subset=['referenceTime', 'unit'], keep='first')
+                cols = ['referenceTime']
+                if 'unit' in df.columns:
+                    cols.append('unit')
+                df = df.drop_duplicates(subset=cols, keep='first')
                 
                 # Pivot to wide format
                 pivoted_df = df.pivot(
@@ -215,6 +218,8 @@ class RawData:
     # Fetch air quality data by Nilu from a CSV file
     def get_nilu(self, threshold, file_path, show_info=False): 
 
+
+
         """
         Fetch air quality data from a CSV file in the data directory.
 
@@ -232,6 +237,15 @@ class RawData:
             # AI tool: DeepSeek
 
         try:
+            # DEBUG: Print raw file contents
+            print("\nDEBUG - Raw file contents:")
+            with open(file_path, 'r', encoding='utf-8') as f:
+                print(f.read())
+            
+            # DEBUG: Print detected columns
+            headers = pd.read_csv(file_path, nrows=1, skiprows=3, sep=';').columns
+            print("\nDEBUG - Detected columns:", headers.tolist())
+
             # parsing csv file
             df = pd.read_csv(
                 file_path,
@@ -239,7 +253,7 @@ class RawData:
                 sep=';',
                 on_bad_lines='skip',
                 encoding='utf-8',
-                parse_dates=['Tid'],
+                parse_dates=[0],
                 date_format='%d.%m.%Y %H:%M',
                 na_values='',  # Replace empty strings with NaN
                 decimal=',',   # Handle comma decimals correctly
@@ -383,7 +397,10 @@ class RawData:
 
             # Only keep future forecasts
             today_str = pd.Timestamp.now().strftime("%Y-%m-%d")
-            return df[df["Date"] >= today_str] 
+            if not df.empty:
+                df['Date'] = pd.to_datetime(df['Date'])
+                today = pd.Timestamp.now().normalize()
+                return df[df['Date'] >= today].copy()
 
         except Exception as e:
             logger.error(f"Failed to fetch forecast: {e}")
