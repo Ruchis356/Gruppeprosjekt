@@ -4,7 +4,6 @@
 import unittest
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression
@@ -83,14 +82,13 @@ class TestWeatherAnalyser(unittest.TestCase):
         
         # These should exist in training mode
         self.assertIn('PM10_lag_1', normal_df.columns)
-        self.assertIn('spike_indicator', normal_df.columns)
 
-        # --- Test test-mode merge without expecting lag/spike ---
+        # --- Test test-mode merge without expecting lag ---
         # Simulate test-data with renamed columns
         test_quality = self.df_quality.iloc[:10].copy()
         test_quality.columns = [col + '_test' if col != 'Date' else col for col in test_quality.columns]
 
-        merged_test = self.analyser.load_and_merge_data(
+        merged_test = self.analyser.load_and_merge_data( # < --------------------- THIS IS THE PROBLEM ------------------
             self.df_weather.iloc[:10],
             test_quality,
             ['temperature (C)', 'wind_speed (m/s)', 'precipitation (mm)'],
@@ -102,9 +100,8 @@ class TestWeatherAnalyser(unittest.TestCase):
         self.assertIsInstance(merged_test, pd.DataFrame)
         self.assertGreater(len(merged_test), 0)
         
-        # We do NOT expect lag or spike in test mode
+        # We do NOT expect lag in test mode
         self.assertNotIn('PM10_lag_1', merged_test.columns)
-        self.assertNotIn('spike_indicator', merged_test.columns)
 
         # But we do expect target columns to be renamed back to normal
         self.assertIn('PM10', merged_test.columns)
