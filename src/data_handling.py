@@ -1,3 +1,6 @@
+
+__all__ = ['RefinedData'] 
+
 import pandas as pd
 import logging # The use of logging was suggested by AI (DeepSeek)
 logging.basicConfig(
@@ -8,14 +11,25 @@ logger = logging.getLogger(__name__)
 
 
 class RefinedData:
-    """A class to refine data for further analysis."""
+    """A class to refine data for further analysis.
+    
+    Primary Methods:
+        missing_data(): Handles missing values with multiple strategies
+        
+    Note:
+        All methods use the module-level logger for consistent output
+    """
 
     # ------------------------------------------
     # PROCESSING MISSING DATA
     # ------------------------------------------
 
     # Check for missing data points and return a list
-    def missing_data(self, df, strategy='report', fill_value=None): # Adding 'strategy' and 'fill_value' as arguments was a suggestion from AI (DeepSeek)
+    def missing_data(
+            self, df: pd.DataFrame, 
+            strategy: str = 'report', 
+            fill_value: float = None
+            ) -> pd.DataFrame: # Adding 'strategy' and 'fill_value' as arguments was a suggestion from AI (DeepSeek)
 
         """
         Handle missing values in the DataFrame.

@@ -1,6 +1,23 @@
 Explains the test structure and how to run tests
 
-# Data_handling:
+# TESTING STRATEGY NOTE:
+# - `utils.py` is intentionally untested because:
+#   1. It is a thin presentation-layer wrapper around pandas/IPython (already stable).
+#   2. Input validity is enforced by earlier pipeline stages (tested elsewhere).
+#   3. Manual verification confirms display behavior in Jupyter/non-Jupyter contexts.
+# - `graph_test.py` has been left untested because: 
+#   1. It is an experimental and uncompleted file/class/function.
+#   2. No data goes past graph_test, and nothing else would fail, it is last in main.
+#   3. We're already aware of the errors that currently exist.
+# - `graphs.py` has been left untested because: 
+#   1. We were running low on time and this was deemed least essential.
+#   2. Manual/visual confirmation of wanted behavour from all functions so far.
+
+
+# test_data_import:
+
+
+# test_data_handling:
 
 This unit test suite verifies the missing_data method of the RefinedData class using Python’s unittest framework. It tests how the method handles missing values in a DataFrame with different strategies:
 
@@ -36,15 +53,8 @@ The setUpClass method creates shared test data: weather measurements, pollution 
 
 The setUp method uses self to create reusable instance variables: a RefinedData processor and a sample DataFrame with missing values. Using self allows these to be accessed across all test methods, ensuring consistency and reducing code repetition.
 
+# test_analysis:
 
-
-# TESTING STRATEGY NOTE:
-# - `VisualTable.pretty_data()` is intentionally untested because:
-#   1. It is a thin presentation-layer wrapper around pandas/IPython (already stable).
-#   2. Input validity is enforced by earlier pipeline stages (tested elsewhere).
-#   3. Manual verification confirms display behavior in Jupyter/non-Jupyter contexts.
-
-# Test_analysis:
 
     Averages: Tests weekly averages are correctly computed.
         Handles missing columns with a warning (NAN)
@@ -71,6 +81,23 @@ The setUp method uses self to create reusable instance variables: a RefinedData 
         Returns None if no outliers are found.
         Logs warnings for missing columns.
         Raises ValueError for invalid standard_deviation or average inputs.
+
+# test_predictive_analysis
+
+This unit test suite verifies the WeatherAnalyser class using Python's unittest framework. It tests core functionality for weather and pollution analysis:
+
+load_and_merge_data: Combines weather and air quality data with feature engineering.
+
+safe_fit: Handles training with missing values.
+
+train_model: Builds models with automatic feature selection.
+
+predict_future: Generates forecasts from trained models.
+
+evaluate_model: Calculates performance metrics (MSE, R²).
+
+The setUpClass method creates shared test data: weather measurements, pollution levels, and a pre-trained model. This ensures consistent test conditions across all methods while minimizing repetition
+
 
 
 

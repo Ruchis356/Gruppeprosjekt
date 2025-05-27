@@ -28,8 +28,8 @@ When using this data for analysis and future predictions, we have chosen to repl
 
 ## Project Structure
 > data
-   - : `FILLFILLFILL`
-   - : `FILLFILLFILL`
+   - : `luftkvalitet_trondheim_2003-2018.csv`
+   - : `Gruppeprosjekt/data/luftkvalitet_trondheim_2018-2024.csv`
    - README.md
 > docs
    > AI declaration

@@ -1,8 +1,5 @@
-"""
-Handles raw data import from:
-- Frost API (weather data)
-- NILU CSV files (air quality data)
-"""
+
+__all__ = ['RawData'] 
 
 import requests
 import pandas as pd
@@ -16,7 +13,19 @@ logger = logging.getLogger(__name__)
 
 
 class RawData:
-    """A class to fetch and preprocess environmental data (weather and air quality)."""
+    """A class to fetch and preprocess environmental data (weather and air quality).
+    
+    Attributes:
+        df: Stores the most recently imported dataset
+        
+    Methods:
+        get_met(): Fetches weather data from Frost API
+        get_nilu(): Fetches air quality data from CSV
+        get_forecast(): Fetches weather forecast data
+        
+    Note:
+        Most methods accept a `show_info` parameter (bool) to control logging verbosity
+    """
 
     def __init__(self):
         self.df = None # Stores the most recently imported dataset
@@ -26,7 +35,7 @@ class RawData:
     # ------------------------------------------
 
     #Fetch weather data from the Frost API 
-    def get_met(self, station_id, elements, time_range, resolution):
+    def get_met(self, station_id, elements, time_range, resolution, show_info=False):
 
         """
         Fetch weather data from the Frost API.
@@ -36,6 +45,7 @@ class RawData:
             elements (str): The measurements to include.
             time_range (str): Date range for the data.
             resolution (str): Time resolution.
+            show_info (bool): Decides if all info is logged or printed.
 
         Returns:
             pd.DataFrame: A DataFrame containing the weather data.
@@ -82,7 +92,7 @@ class RawData:
                 'timeresolutions': resolution,  # Set the resolution(granularity) of the data
                 'levels': 'default',
                 'timeoffsets': 'default', # Selects the best timeiffset value available, first PT6H then PT0H
-                'qualities': '0,1,2,3,4' # Only import data of a high enough quailty as explained here: https://frost.met.no/dataclarifications.html#quality-code
+                'qualities': '0,1,2,3,4' # Only import data of a high enough quality as explained here: https://frost.met.no/dataclarifications.html#quality-code
             }
 
             # Send an HTTP GET-request
@@ -91,15 +101,17 @@ class RawData:
             # Extract JSON-data
             json_data = response.json()
 
-            # Check if the request was succesfull, and exit if not
+            # Check if the request was successfull, and exit if not
             if response.status_code == 200:
                 data = json_data['data']
                 unique_times = len({obs['referenceTime'] for obs in data})
-                logger.info(
-                    '\nSuccessfully collected %s raw observations (%s unique timestamps) from Frost API\n',
-                    len(data), 
-                    unique_times
-                )
+
+                if show_info:
+                    logger.info(
+                        '\nSuccessfully collected %s raw observations (%s unique timestamps) from Frost API\n',
+                        len(data), 
+                        unique_times
+                    )
             else:
                 logger.error(
                     'API Error %s: %s (Reason: %s)',
@@ -123,7 +135,7 @@ class RawData:
                     data_list.append(row)
             df = pd.DataFrame(data_list)
 
-            # Remove uneeded collumns  
+            # Remove unneeded collumns  
             columns_to_drop = ["level", "timeResolution", "timeSeriesId", "elementId", "performanceCategory", "exposureCategory", "qualityCode"]
             df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
 
@@ -164,12 +176,13 @@ class RawData:
 
                 df['Date'] = pd.to_datetime(df['Date'])
 
-            logger.info(
-                '\nProcessed DataFrame: %s rows x %s parameters (%.1f%% non-empty values)\n',
-                df.shape[0],
-                df.shape[1] - 1, #Ignoring date column
-                100 * df.iloc[:, 1:].notna().mean().mean() 
-            )
+            if show_info:
+                logger.info(
+                    '\nProcessed DataFrame: %s rows x %s parameters (%.1f%% non-empty values)\n',
+                    df.shape[0],
+                    df.shape[1] - 1, #Ignoring date column
+                    100 * df.iloc[:, 1:].notna().mean().mean() 
+                )
 
             # Returns pd.DataFrame upon request
             return df 
@@ -200,7 +213,7 @@ class RawData:
     # ------------------------------------------
 
     # Fetch air quality data by Nilu from a CSV file
-    def get_nilu(self, threshold, file_path): 
+    def get_nilu(self, threshold, file_path, show_info=False): 
 
         """
         Fetch air quality data from a CSV file in the data directory.
@@ -208,7 +221,8 @@ class RawData:
         Args:
             file_path (str): Path to NILU CSV file (expected format: semicolon-delimited)
             threshold (float): Minimum coverage percentage (0-100) - measurements with lower coverage will be set to NaN
-
+            show_info (bool): Decides if all info is logged or printed.
+            
         Returns:
             pd.DataFrame: A DataFrame containing the air quality data.
         """
@@ -233,11 +247,12 @@ class RawData:
                     if col != 'Tid'}  # Pre-specify dtypes
             )
 
-            logger.info(
-                '\nSuccessfully collected and processed %s rows of data from \n%s\n',
-                df.shape[0], 
-                file_path
-            )
+            if show_info:
+                logger.info(
+                    '\nSuccessfully collected and processed %s rows of data from \n%s\n',
+                    df.shape[0], 
+                    file_path
+                )
       
             # The following two blocks are an improvement made based on a suggestion from AI
                 # Purpose: Entirely replace a function in 'data_handling' that dealt with coverage by utilising and removing the overage columns within this function
@@ -255,13 +270,14 @@ class RawData:
             df = df.rename(columns=new_cols)
 
             self.df = df
-
-            logger.info(
-                '\nProcessed DataFrame: %s rows x %s parameters (%.1f%% non-empty values)\n',
-                df.shape[0],
-                df.shape[1] - 1, #Ignoring date column
-                100 * df.iloc[:, 1:].notna().mean().mean() 
-            )
+            
+            if show_info:
+                logger.info(
+                    '\nProcessed DataFrame: %s rows x %s parameters (%.1f%% non-empty values)\n',
+                    df.shape[0],
+                    df.shape[1] - 1, #Ignoring date column
+                    100 * df.iloc[:, 1:].notna().mean().mean() 
+                )
             
             # Returns pd.DataFrame
             return df

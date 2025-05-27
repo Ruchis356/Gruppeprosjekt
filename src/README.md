@@ -1,71 +1,112 @@
+# Source Code Documentation
+Note: This file was formatted by AI (DeepSeek)
+
 ## analysis.py
-🔹 averages(df, column_names)
-Calculates weekly averages for specified columns, skipping missing values.
-Returns a DataFrame with one row per week, including the week's starting date and averages. Warns on missing/invalid columns.
+**Statistical analysis of environmental data**
 
-🔹 total_average(df, column_names)
-Computes overall means for valid weather and air quality columns, ignoring invalid or missing ones.
+### Key Functions:
+- `averages(df, column_names)`  
+  Calculates weekly averages for specified columns. Handles missing values intelligently. Returns DataFrame with weekly dates and averages.
 
-🔹 standard_deviation(df, column_names)
-Returns standard deviation for each valid column in the DataFrame.
+- `total_average(df, column_names)`  
+  Computes overall means for valid columns.
 
-🔹 outliers(df, column_names, standard_deviation, average, sd_modifier)
-Identifies outliers using avg ± (std_dev × modifier).
-Returns:
+- `standard_deviation(df, column_names)`  
+  Calculates standard deviations.
 
-A DataFrame of detected outliers with dates
+- `outliers(df, column_names, std_dev, avg, sd_modifier=2)`  
+  Identifies outliers using `avg ± (std_dev × modifier)`.  
+  Returns tuple: (DataFrame of outliers, cleaned data with outliers as NaN)
 
-A copy of the data with outliers replaced by NaN
+- `box_plots(df, columns, ...)`  
+  Creates boxplots with outlier visualization.
+
+---
 
 ## data_handling.py
+**Missing data processing**
 
-Handles missing data with the following modes:
+### Key Function:
+- `missing_data(df, strategy='report', fill_value=None)`  
+  Processes missing values with three strategies:  
+  • `report` - Returns missing value locations  
+  • `drop` - Removes rows with missing values  
+  • `fill` - Replaces with specified `fill_value`
 
-'report': Returns locations of missing values
-
-'drop': Removes rows with missing values
-
-'fill': Replaces missing values with fill_value
-
-Returns a modified DataFrame or None if no missing values found.
+---
 
 ## data_import.py
+**Class: RawData**  
+Fetches and cleans environmental data from multiple sources.
 
-🔹 Class: RawData
-Handles weather and air quality data import and cleanup.
+### Methods:
+- `get_met(station_id, elements, time_range, resolution)`  
+  Fetches weather data from Frost API. Automatically pivots to wide format. Includes robust error handling.
 
-get_met(...):
-Fetches weather data from Frost API, cleans and pivots it, returns daily values. Robust error handling included.
+- `get_nilu(threshold, file_path)`  
+  Processes air quality CSVs from NILU. Filters by coverage threshold (0-100). Standardizes column names.
 
-get_nilu(threshold, file_path):
-Reads and cleans NILU CSV data, filters by coverage threshold, renames columns, and handles parsing errors.
+- `get_forecast(station_id=None, lat=63.419, lon=10.395)`  
+  Fetches **7-day weather forecast** from MET Norway API.  
+  - Uses station coordinates if provided  
+  - Returns daily aggregates (temp, wind, precip)  
+
+---
 
 ## graphs.py
+**Class: Graphs**
+Static data visualization.
 
-Creates time-series plots with Matplotlib & Seaborn:
+### Key Functions:
+- `dot_graph(df, columns, title, x_axis, y_axis)`  
+  Creates scatter plots for time-series data.
 
-dot_graph(...) – Scatter plots of multiple variables over time
+- `comparative_graph(df, columns, df_predictor, predictor, ...)`  
+  Generates dual-axis plots for pollutants vs weather.
 
-comparative_graph(...) – Dual-axis plot of pollutants vs. weather
+**Class: PredictiveGraphs**  
+Advanced visualization for model outputs.
 
-box_plot(...) – Boxplots including all outlier data
+### Key Methods:
+- `plot_full_overview()`  
+  Compares historical vs predicted vs API forecast data  
+- `plot_week_comparison()`  
+  Detailed 7-day forecast comparison  
+- `plot_results()`  
+  Shows actual vs predicted pollution levels  
+- `plot_comparison()`  
+  Side-by-side train/test set performance  
+- `plot_pollutant_forecasts()`  
+  Multi-pollutant forecast visualization  
+- `model_information()`  
+  Displays feature importance and diagnostic plots  
+
+---
 
 ## predictive_analysis.py
+**Weather forecasting and pollution prediction**
 
-Builds seasonal weather models and compares them to API forecasts.
+### Core Features:
+- `load_and_merge_data()` - Cleans and merges historical data
+- `create_model()` - Trains polynomial regression models
+- `train_model()` - Configures Random Forest models
+- `forecast_pollutants_with_lags()` - Recursive forecasting
+- `predict_future(model, last_date, days_to_predict)` - Generates future predictions using trained models
 
-load_and_prepare_data(): Cleans historical temp/precip data
-
-create_model(): Trains polynomial regression (default degree 4)
-
-get_daily_api_forecast(): Aggregates MET Norway forecast
-
-predict_future(): Uses models to predict upcoming weather
-
-plot_full_overview(): Visualizes historical vs. predicted vs. API
-
-plot_week_comparison(): Compares 7-day model vs. API forecast
+---
 
 ## utils.py
-Defines VisualTable for rendering large DataFrames.
-In Jupyter: scrollable HTML; otherwise: standard printout.
+**Data display utilities**
+
+### Class: VisualTable
+- `pretty_data(df)`  
+  Displays DataFrames as:  
+  • Scrollable HTML tables (Jupyter)  
+  • Formatted text (terminal)  
+  Auto-formats dates and numbers.
+
+---
+
+## graph_test.py
+*Experimental Plotly visualizations*  
+⚠️ Note: Not fully integrated into main workflow
