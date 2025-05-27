@@ -1,8 +1,5 @@
-"""
-Handles raw data import from:
-- Frost API (weather data)
-- NILU CSV files (air quality data)
-"""
+
+__all__ = ['RawData'] 
 
 import requests
 import pandas as pd
@@ -16,7 +13,19 @@ logger = logging.getLogger(__name__)
 
 
 class RawData:
-    """A class to fetch and preprocess environmental data (weather and air quality)."""
+    """A class to fetch and preprocess environmental data (weather and air quality).
+    
+    Attributes:
+        df: Stores the most recently imported dataset
+        
+    Methods:
+        get_met(): Fetches weather data from Frost API
+        get_nilu(): Fetches air quality data from CSV
+        get_forecast(): Fetches weather forecast data
+        
+    Note:
+        Most methods accept a `show_info` parameter (bool) to control logging verbosity
+    """
 
     def __init__(self):
         self.df = None # Stores the most recently imported dataset
@@ -36,6 +45,7 @@ class RawData:
             elements (str): The measurements to include.
             time_range (str): Date range for the data.
             resolution (str): Time resolution.
+            show_info (bool): Decides if all info is logged or printed.
 
         Returns:
             pd.DataFrame: A DataFrame containing the weather data.
@@ -211,7 +221,8 @@ class RawData:
         Args:
             file_path (str): Path to NILU CSV file (expected format: semicolon-delimited)
             threshold (float): Minimum coverage percentage (0-100) - measurements with lower coverage will be set to NaN
-
+            show_info (bool): Decides if all info is logged or printed.
+            
         Returns:
             pd.DataFrame: A DataFrame containing the air quality data.
         """
