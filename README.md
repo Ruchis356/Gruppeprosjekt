@@ -32,14 +32,13 @@ When using this data for analysis and future predictions, we have chosen to repl
    - : `Gruppeprosjekt/data/luftkvalitet_trondheim_2018-2024.csv`
    - README.md
 > docs
-   > AI declaration
-   -
-      - AI declaration.pdf: `The declaration of AI usage in this project, signed by the developers.`
+   > AI declaration 
+   .  - AI declaration.pdf: `The declaration of AI usage in this project, signed by the developers.`
       - detailed AI use.md:  `A line for line/block for block breakdown of AI usage in this project.` 
    - bibliography.md: `A list of external resources used in this project.`
    - README.md
 > notebooks
-   - main.ipynb: `Main script for importing and processing data. All variables can be set in the code of main.`
+   - main.ipynb: `Main script for importing, processing, and analysing data, select variables here.`
    - README.md
 > resources
    - README.md
@@ -49,13 +48,22 @@ When using this data for analysis and future predictions, we have chosen to repl
    - analysis.py: `Contains the AnalysedData class for numerical analysis eg. average(mean) and standard deviation.`
    - data_handling.py: `Contains the RefinedData class for processing data eg. dealing with missing values.`
    - data_import.py: `Contains the RawData class for importing weather and air quality data.`
-   - graphs.py: `Contains the Graphs class for creating graphs based on the data to visualise patterns and comparing factors.`
-   - predictive_analysis.py: `FILLFILLFILL`
+   - graph_test.py: `Contains the lass InteractiveGraphs experiments with interactive graphing.`
+   - graphs.py: 
+      - `Contains the Graphs class for creating graphs based on the data to visualise patterns and comparing factors.`
+      - `Contains the PredictiveGraphs class for creating graphs based on models and predictions.`
+   - predictive_analysis.py: `Contains the class WeatherAnalyser for creating models and predictions based on the given weather and pollution data.`
    - README.md
-   - utils.py: `Contains a collection of simple tools for data handling and visualisation.`
+   - utils.py: `Contains a collection of simple tools for data handling and visualisation. Currently only a function for producing readable tables.`
 > test
-   - : `FILLFILLFILL`
-   - : `FILLFILLFILL`
+   - README.md
+   - test_analysis.py: 
+      - `Contains the class TestAverages for testing functions in the corresponding file in src.`
+      - `Contains the class TestTotalAverage for testing functions in the corresponding file in src.`
+   - test_data_handling.py: `Contains the class TestRefinedData for testing the corresponding file in src.`
+   - test_data_import.py: `Contains the class TestRawData for testing the corresponding file in src.`
+   - test_predictive_analysis.py: `Contains the class TestWeatherAnalyser for testing the corresponding file in src.`
+> venv
 - .gitignore: `This file specifies which files and directories are ignored when commits are made to the remote repository by the developers.`
 - README.md: `This file -contains the necesarry instructions for understanding the project, the folder structure, and how each part functions. Each sub-folder also contains a README file for its specific content, with each file described in more detail.`
 - reuqirements.txt: `Describes the requirement for running the complete project on your computer.`
