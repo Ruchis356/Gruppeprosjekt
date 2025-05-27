@@ -1,110 +1,19 @@
 
-
-# Test for get_forecast yet
-#The code for TestGetForecast code was created entirely by the use of ChatGPT
-# Developer learned the cocnept of mock_response and continued use of self.assertIsInstance and self.assertEqual fucntions. 
-
-import unittest
-from unittest.mock import patch, MagicMock
-import pandas as pd
-import numpy as np
-
-# Assuming your class is named WeatherFetcher and is imported properly
-# from your_module import WeatherFetcher
-
-class TestGetForecast(unittest.TestCase):
-
-    @patch("your_module.requests.get")
-    @patch("your_module.pd.Timestamp")
-    def test_get_forecast_basic(self, mock_timestamp, mock_requests_get):
-        # Prepare mock timestamp
-        mock_now = pd.Timestamp("2024-05-01")
-        mock_timestamp.now.return_value = mock_now
-
-        # Mock response from MET API (locationforecast)
-        met_response = {
-            "properties": {
-                "timeseries": [
-                    {
-                        "time": "2024-05-01T00:00:00Z",
-                        "data": {
-                            "instant": {
-                                "details": {
-                                    "air_temperature": 10,
-                                    "wind_speed": 5
-                                }
-                            },
-                            "next_6_hours": {
-                                "details": {
-                                    "precipitation_amount": 1
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "time": "2024-05-01T06:00:00Z",
-                        "data": {
-                            "instant": {
-                                "details": {
-                                    "air_temperature": 12,
-                                    "wind_speed": 6
-                                }
-                            },
-                            "next_6_hours": {
-                                "details": {
-                                    "precipitation_amount": 2
-                                }
-                            }
-                        }
-                    }
-                ]
-            }
-        }
-
-        # Configure mock
-        mock_response = MagicMock()
-        mock_response.raise_for_status = MagicMock()
-        mock_response.json.return_value = met_response
-        mock_requests_get.return_value = mock_response
-
-        # Run method
-        fetcher = WeatherFetcher()
-        df = fetcher.get_forecast()
-
-        # Assert DataFrame contents
-        self.assertIsNotNone(df)
-        self.assertIn("Date", df.columns)
-        self.assertEqual(len(df), 1)
-        self.assertEqual(df.iloc[0]["Date"], "2024-05-01")
-        self.assertAlmostEqual(df.iloc[0]["temperature (C)"], 11)
-        self.assertAlmostEqual(df.iloc[0]["wind_speed (m/s)"], 5.5)
-        self.assertAlmostEqual(df.iloc[0]["precipitation (mm)"], 3)
-
-if __name__ == "__main__":
-    unittest.main()
-
-
-
-
-
-
-
-
 import sys, os
 import pandas as pd
 import unittest
 import requests
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, MagicMock
 
 # Add the parent directory to the sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
 from data_import import RawData
 
+
 class TestRawData(unittest.TestCase):
 
     ### TESTING GET_MET FUNCTION###
-
 
     # Test that the function correctly fetches data and returns a DataFrame with the expected parameters
     @patch('requests.get')
@@ -139,7 +48,7 @@ class TestRawData(unittest.TestCase):
         self.assertEqual(result.shape[0], 2)            # Is it the expected shape?
         self.assertIn('referenceTime', result.columns)  # Did the function place the values in the right columns?
     
-    # Thest that the function handles invalid inputs gracefully
+    # Test that the function handles invalid inputs gracefully
     @patch('requests.get')
     def test_get_met_invalid_input(self, mock_get):
 
@@ -161,7 +70,7 @@ class TestRawData(unittest.TestCase):
         #Assertions: Does the function return "None" when given invalid inputs?
         self.assertIsNone(result) 
 
-    # Check if the function handles an API error graciously
+    # Check if the function handles an API error gracefully
     @patch('requests.get')
     def test_get_met_api_error(self, mock_get):
 
@@ -183,7 +92,7 @@ class TestRawData(unittest.TestCase):
         # Assertions: Does the function return the expected "None" with an API error?
         self.assertIsNone(result)
 
-    # Check if the function handles a connection error graciously
+    # Check if the function handles a connection error gracefully
     @patch('requests.get')
     def test_get_met_connection_error(self, mock_get):
 
@@ -198,13 +107,7 @@ class TestRawData(unittest.TestCase):
         self.assertIsNone(result)
 
 
-
-
-
-
-
     ### TESTING GET_NILU FUNCTION###
-
 
     # Test that the function is able to read a csv file, and creates the expected dataframe
     def test_get_nilu_success(self):
@@ -267,13 +170,76 @@ Tid;Dekning;Dekning.1;Dekning.2;Dekning.3;Dekning.4
         os.remove('malformed.csv')
 
 
-
-
     ### TESTING GET_FORECAST FUNCTION###
 
+    # The code for TestGetForecast code was created entirely by the use of ChatGPT
+    # Developer learned the cocnept of mock_response and continued use of self.assertIsInstance and self.assertEqual fucntions. 
 
+    @patch("data_import.requests.get")
+    @patch("data_import.pd.Timestamp")
+    def test_get_forecast_basic(self, mock_timestamp, mock_requests_get):
+        # Prepare mock timestamp
+        mock_now = pd.Timestamp("2024-05-01")
+        mock_timestamp.now.return_value = mock_now
 
-if __name__ == '__main__':
+        # Mock response from MET API (locationforecast)
+        met_response = {
+            "properties": {
+                "timeseries": [
+                    {
+                        "time": "2024-05-01T00:00:00Z",
+                        "data": {
+                            "instant": {
+                                "details": {
+                                    "air_temperature": 10,
+                                    "wind_speed": 5
+                                }
+                            },
+                            "next_6_hours": {
+                                "details": {
+                                    "precipitation_amount": 1
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "time": "2024-05-01T06:00:00Z",
+                        "data": {
+                            "instant": {
+                                "details": {
+                                    "air_temperature": 12,
+                                    "wind_speed": 6
+                                }
+                            },
+                            "next_6_hours": {
+                                "details": {
+                                    "precipitation_amount": 2
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+
+        # Configure mock
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock()
+        mock_response.json.return_value = met_response
+        mock_requests_get.return_value = mock_response
+
+        # Run method
+        fetcher = RawData()
+        df = fetcher.get_forecast()
+
+        # Assert DataFrame contents
+        self.assertIsNotNone(df)
+        self.assertIn("Date", df.columns)
+        self.assertEqual(len(df), 1)
+        self.assertEqual(df.iloc[0]["Date"], "2024-05-01")
+        self.assertAlmostEqual(df.iloc[0]["temperature (C)"], 11)
+        self.assertAlmostEqual(df.iloc[0]["wind_speed (m/s)"], 5.5)
+        self.assertAlmostEqual(df.iloc[0]["precipitation (mm)"], 3)
+
+if __name__ == "__main__":
     unittest.main()
-
-

@@ -92,7 +92,7 @@ class RawData:
                 'timeresolutions': resolution,  # Set the resolution(granularity) of the data
                 'levels': 'default',
                 'timeoffsets': 'default', # Selects the best timeiffset value available, first PT6H then PT0H
-                'qualities': '0,1,2,3,4' # Only import data of a high enough quailty as explained here: https://frost.met.no/dataclarifications.html#quality-code
+                'qualities': '0,1,2,3,4' # Only import data of a high enough quality as explained here: https://frost.met.no/dataclarifications.html#quality-code
             }
 
             # Send an HTTP GET-request
@@ -101,7 +101,7 @@ class RawData:
             # Extract JSON-data
             json_data = response.json()
 
-            # Check if the request was succesfull, and exit if not
+            # Check if the request was successfull, and exit if not
             if response.status_code == 200:
                 data = json_data['data']
                 unique_times = len({obs['referenceTime'] for obs in data})
@@ -135,7 +135,7 @@ class RawData:
                     data_list.append(row)
             df = pd.DataFrame(data_list)
 
-            # Remove uneeded collumns  
+            # Remove unneeded collumns  
             columns_to_drop = ["level", "timeResolution", "timeSeriesId", "elementId", "performanceCategory", "exposureCategory", "qualityCode"]
             df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
 
